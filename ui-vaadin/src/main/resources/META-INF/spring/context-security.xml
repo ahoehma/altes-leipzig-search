@@ -1,0 +1,31 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                      http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+  <global-method-security secured-annotations="enabled"/>
+
+  <authentication-manager alias="authenticationManager"  erase-credentials="false">
+    <authentication-provider user-service-ref="userService">
+      <password-encoder hash="sha-256" base64="false" />
+    </authentication-provider>
+  </authentication-manager>
+
+  <user-service id="userService">
+    <user name="demo" password="2a97516c354b68848cdbd8f54a226a0a55b21ed138e207ad6c5cbb9c00aa5aea" authorities="ROLE_USER" />
+    <user name="admin" password="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918" authorities="ROLE_ADMIN" />
+  </user-service>
+
+  <http pattern="/VAADIN/**" security="none"/>
+  <http pattern="/main/**" security="none"/>
+
+  <http auto-config="true">
+    <http-basic/>
+    <intercept-url pattern="/admin/**" access="ROLE_ADMIN" requires-channel="https"/>
+  </http>
+
+  <beans:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler">
+    <beans:property name="invalidateHttpSession" value="false" />
+  </beans:bean>
+
+</beans:beans>

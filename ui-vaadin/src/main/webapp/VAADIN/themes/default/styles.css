@@ -1,0 +1,18 @@
+@import "../reindeer/legacy-styles.css";
+
+.v-generated-body {
+	background: url("img/body_verlauf_1.jpg") repeat-x;
+	padding: 0;
+	margin: 0;
+}
+
+#sitebody {
+	width: 700px;
+	margin: 0 auto;
+	padding: 15px 0 50px 0;
+}
+
+#header1 {
+	height: 166px;
+	background: url("img/1892_unterseite.png") no-repeat;
+}
