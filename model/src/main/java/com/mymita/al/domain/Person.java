@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 
 @NodeEntity
 @TypeAlias("Person")
+@Indexed
 public class Person {
 
   public enum Gender {
@@ -23,18 +24,21 @@ public class Person {
 
   @GraphId
   private Long           id;
+
   @Indexed(unique = true)
   private String         code;
+
   private String         firstName;
   private String         lastName;
+  private String         birthName;
   private Gender         gender;
   private Date           dateOfBirth;
   private Date           dateOfChristening;
   private Date           dateOfDeath;
   private Date           dateOfBuried;
   private String         description;
-  private String         birthName;
   private String         yearsOfLife;
+
   @RelatedTo(type = "HAS_TAG")
   @Fetch
   private final Set<Tag> tags = Sets.newHashSet();

@@ -7,7 +7,8 @@
 		</encoder>
 	</appender>
 
-	<logger name="com.mymita.firmenlauf2013" level="DEBUG" />
+	<logger name="org.springframework.data.neo4j" level="DEBUG" />
+	<logger name="org.neo4j" level="DEBUG" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

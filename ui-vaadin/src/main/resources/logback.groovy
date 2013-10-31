@@ -36,7 +36,7 @@ logger("org.springframework", WARN, ["CONSOLE", "FILE"])
 logger("org.springframework.transaction", WARN, ["CONSOLE", "FILE"])
 logger("org.springframework.security", WARN, ["CONSOLE", "FILE"])
 logger("com.mymita.al", INFO, ["CONSOLE", "FILE"])
-logger("org.eclipse.jetty", INFO, ["CONSOLE", "FILE"])
+logger("org.springframework.data.neo4j", DEBUG, ["CONSOLE", "FILE"])
 
 root(ERROR, ["CONSOLE", "FILE"])
 

@@ -2,19 +2,27 @@ package com.mymita.al.ui.search;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.neo4j.annotation.QueryType;
+import org.springframework.data.neo4j.support.Neo4jTemplate;
+import org.springframework.data.neo4j.support.conversion.EntityResultConverter;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Tag;
@@ -23,11 +31,12 @@ import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomLayout;
@@ -38,6 +47,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
 @Configurable
@@ -128,6 +138,17 @@ public class MainUI extends UI {
     }
   }
 
+  private static Date asDate(final String value) {
+    if (value == null || value.trim().isEmpty()) {
+      return null;
+    }
+    try {
+      return new SimpleDateFormat("dd.MM.yyyyy hh:mm:ss").parse(String.format("1.1.%s 00:00:00", value));
+    } catch (final ParseException e) {
+    }
+    return null;
+  }
+
   private static String getYearFromDate(final Date date) {
     if (date == null) {
       return "";
@@ -137,6 +158,8 @@ public class MainUI extends UI {
 
   @Autowired
   transient PersonRepository service;
+  @Autowired
+  transient Neo4jTemplate    template;
 
   @Override
   protected void init(final VaadinRequest request) {
@@ -158,48 +181,41 @@ public class MainUI extends UI {
       results.setVisibleColumns(new Object[] { "code", "lastName", "birthName", "firstName", "yearOfBirth", "yearOfDeath", "yearsOfLife" });
       results.setVisible(false);
       results.setSelectable(true);
+      results.setMultiSelect(true);
       results.addValueChangeListener(new ValueChangeListener() {
 
         @Override
         public void valueChange(final ValueChangeEvent event) {
-          final PersonDTO person = (PersonDTO) event.getProperty().getValue();
-          if (person != null) {
-            final String tagsText = Joiner.on(", ").join(person.getTags());
-            if (!Strings.isNullOrEmpty(tagsText)) {
-              final HorizontalLayout tags = new HorizontalLayout();
-              tags.addComponent(new Label("Beschreibung:"));
-              tags.addComponent(new Label(tagsText));
-              content.addComponent(tags, "tags");
-              return;
+          final Collection<PersonDTO> persons = (Collection<PersonDTO>) event.getProperty().getValue();
+          if (!persons.isEmpty()) {
+            final VerticalLayout infos = new VerticalLayout();
+            infos.setMargin(new MarginInfo(true, false, true, false));
+            infos.setSpacing(true);
+            infos.addComponent(new Label("<b>Informationen zu den gewählten Personen</b>", ContentMode.HTML));
+            for (final PersonDTO person : persons) {
+              final HorizontalLayout hl = new HorizontalLayout();
+              hl.addComponent(new Label(String.format("<b>%s</b>:&nbsp;", person.getCode()), ContentMode.HTML));
+              hl.addComponent(new Label(Joiner.on("").join(person.getTags())));
+              infos.addComponent(hl);
             }
+            content.addComponent(infos, "description");
+          } else {
+            content.removeComponent("description");
           }
-          content.removeComponent("tags");
         }
       });
       results.setImmediate(true);
       results.setPageLength(15);
       final HorizontalLayout resultsControl = results.createControls();
       resultsControl.setVisible(false);
-      final TextField firstName = new TextField("Vorname");
-      firstName.setNullSettingAllowed(true);
-      firstName.setNullRepresentation("");
-      firstName.setValue(null);
-      firstName.setStyleName("search");
-      firstName.setWidth("150px");
-      firstName.addValidator(new StringLengthValidator(
-          "Bitte geben Sie mindestens 5 aber nicht mehr als 20 Buchstaben für den Vornamen ein.", 5, 20, true));
-      firstName.setRequired(false);
-      firstName.setValidationVisible(false);
-      final TextField lastName = new TextField("Nachname");
-      lastName.setNullSettingAllowed(true);
-      lastName.setNullRepresentation("");
-      lastName.setValue(null);
-      lastName.setStyleName("search");
-      lastName.setWidth("150px");
-      lastName.addValidator(new StringLengthValidator(
-          "Bitte geben Sie mindestens 5 aber nicht mehr als 20 Buchstaben für den Nachnamen ein.", 5, 20, true));
-      lastName.setRequired(false);
-      lastName.setValidationVisible(false);
+      final TextField name = new TextField("Name");
+      name.setNullSettingAllowed(true);
+      name.setNullRepresentation("");
+      name.setValue(null);
+      name.setStyleName("search");
+      name.setWidth("150px");
+      name.setRequired(false);
+      name.setValidationVisible(false);
       final TextField yearOfBirth = new TextField("Geburtsjahr");
       yearOfBirth.setStyleName("search");
       yearOfBirth.setWidth("80px");
@@ -207,39 +223,39 @@ public class MainUI extends UI {
 
         @Override
         public void buttonClick(final ClickEvent event) {
-          try {
-            firstName.validate();
-            lastName.validate();
-          } catch (final InvalidValueException e) {
-            final Notification notification = new Notification(e.getLocalizedMessage(), Type.HUMANIZED_MESSAGE);
-            notification.setDelayMsec(2000);
-            notification.show(Page.getCurrent());
-            return;
-          }
-          final String ln = lastName.getValue();
-          final String fn = firstName.getValue();
-          final String by = yearOfBirth.getValue();
-          if (!Strings.isNullOrEmpty(by)) {
-            final Date date = new Date(Integer.valueOf(by) - 1900, 0, 0);
-            final FluentIterable<Person> hits = FluentIterable.from(service.findByDateOfBirth(date, null));
-            showHits(hits);
-          } else if (Strings.isNullOrEmpty(ln) && !Strings.isNullOrEmpty(fn)) {
-            final FluentIterable<Person> hits = FluentIterable.from(service.findByFirstNameLike(fn, null));
-            showHits(hits);
-          } else if (!Strings.isNullOrEmpty(ln) && Strings.isNullOrEmpty(fn)) {
-            final FluentIterable<Person> hits = FluentIterable.from(service.findByLastNameLike(ln, null));
-            showHits(hits);
-          } else if (!Strings.isNullOrEmpty(ln) && !Strings.isNullOrEmpty(fn)) {
-            final FluentIterable<Person> hits = FluentIterable.from(service.findByLastNameLikeAndFirstNameLike(ln, fn, null));
-            showHits(hits);
+          final String nameValue = name.getValue();
+          final String yearOfBirthValue = yearOfBirth.getValue();
+          if (!Strings.isNullOrEmpty(nameValue) && !Strings.isNullOrEmpty(yearOfBirthValue)) {
+            final String q = String.format("START person=node:__types__(className='Person') " + "WHERE (person.birthName =~ '(?i)%s' "
+                + "OR person.lastName =~ '(?i)%s') AND person.dateOfBirth! = {dateOfBirth} " + "RETURN person", nameValue, nameValue);
+            final Map<String, Object> params = Maps.newHashMap();
+            params.put("dateOfBirth", asDate(yearOfBirthValue));
+            final List<Person> persons = Lists.newArrayList(template.getGraphDatabase().queryEngineFor(QueryType.Cypher).query(q, params)
+                .to(Person.class, new EntityResultConverter<Object, Person>(template.getConversionService(), template)).iterator());
+            showHits(persons);
           } else {
-            showHits(FluentIterable.<Person> from(Lists.<Person> newArrayList()));
+            if (!Strings.isNullOrEmpty(nameValue)) {
+              final String q = String.format("START person=node:__types__(className='Person') " + "WHERE (person.birthName =~ '(?i)%s' "
+                  + "OR person.lastName =~ '(?i)%s') " + "RETURN person", nameValue, nameValue);
+              final List<Person> persons = Lists.newArrayList(template.getGraphDatabase().queryEngineFor(QueryType.Cypher).query(q, null)
+                  .to(Person.class, new EntityResultConverter<Object, Person>(template.getConversionService(), template)).iterator());
+              showHits(persons);
+            }
+            if (!Strings.isNullOrEmpty(yearOfBirthValue)) {
+              final String q = "START person=node:__types__(className='Person') "
+                  + "WHERE person.dateOfBirth! = {dateOfBirth} RETURN person";
+              final Map<String, Object> params = Maps.newHashMap();
+              params.put("dateOfBirth", asDate(yearOfBirthValue));
+              final List<Person> persons = Lists.newArrayList(template.getGraphDatabase().queryEngineFor(QueryType.Cypher).query(q, params)
+                  .to(Person.class, new EntityResultConverter<Object, Person>(template.getConversionService(), template)).iterator());
+              showHits(persons);
+            }
           }
         }
 
-        private void showHits(final FluentIterable<Person> hits) {
+        private void showHits(final List<Person> persons) {
           dataSource.removeAllItems();
-          dataSource.addAll(hits.transform(new Function<Person, PersonDTO>() {
+          dataSource.addAll(FluentIterable.from(persons).transform(new Function<Person, PersonDTO>() {
             @Override
             public PersonDTO apply(final Person input) {
               final PersonDTO result = new PersonDTO();
@@ -255,7 +271,7 @@ public class MainUI extends UI {
 
             }
           }).toList());
-          if (!hits.isEmpty()) {
+          if (!persons.isEmpty()) {
             results.setContainerDataSource(dataSource);
             results.setVisibleColumns(new Object[] { "code", "lastName", "birthName", "firstName", "yearOfBirth", "yearOfDeath",
                 "yearsOfLife" });
@@ -269,16 +285,15 @@ public class MainUI extends UI {
             notification.show(Page.getCurrent());
           }
         }
+
       });
-      content.addComponent(firstName, "firstName");
-      content.addComponent(lastName, "lastName");
+      search.setClickShortcut(KeyCode.ENTER);
+      content.addComponent(name, "name");
       content.addComponent(yearOfBirth, "yearOfBirth");
       content.addComponent(search, "search");
       content.addComponent(results, "results");
       setContent(content);
     } catch (final IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
   }
 }
