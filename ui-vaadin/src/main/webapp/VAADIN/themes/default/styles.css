@@ -16,3 +16,8 @@
 	height: 166px;
 	background: url("img/1892_unterseite.png") no-repeat;
 }
+
+.v-gridlayout-result-details.v-margin-top,v-margin-bottom {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}

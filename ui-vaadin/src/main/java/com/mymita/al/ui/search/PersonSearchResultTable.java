@@ -3,6 +3,7 @@ package com.mymita.al.ui.search;
 import com.google.common.collect.Lists;
 import com.jensjansson.pagedtable.PagedTable;
 import com.jensjansson.pagedtable.PagedTableContainer;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -16,10 +17,6 @@ import com.vaadin.ui.NativeButton;
 public class PersonSearchResultTable extends PagedTable {
 
   private static final long serialVersionUID = -249098649321082542L;
-
-  public PersonSearchResultTable() {
-    super();
-  }
 
   @Override
   public HorizontalLayout createControls() {
@@ -47,6 +44,8 @@ public class PersonSearchResultTable extends PagedTable {
     totalPagesLabel.setWidth(null);
 
     final HorizontalLayout controlBar = new HorizontalLayout();
+    controlBar.setStyleName("result-table-controls");
+    controlBar.setMargin(new MarginInfo(true, false, true, false));
     final HorizontalLayout pageSize = new HorizontalLayout();
     final HorizontalLayout pageManagement = new HorizontalLayout();
     final Button first = new NativeButton("<<", new ClickListener() {
@@ -122,11 +121,15 @@ public class PersonSearchResultTable extends PagedTable {
     controlBar.addComponent(pageSize);
     controlBar.addComponent(pageManagement);
     controlBar.setComponentAlignment(pageManagement, Alignment.MIDDLE_LEFT);
-
     addListener(new PageChangeListener() {
       @Override
       public void pageChanged(final PagedTableChangeEvent event) {
         final PagedTableContainer container = (PagedTableContainer) getContainerDataSource();
+        if (event.getTable().getPageLength() == 0) {
+          pageManagement.setVisible(false);
+          return;
+        }
+        pageManagement.setVisible(true);
         first.setEnabled(container.getStartIndex() > 0);
         previous.setEnabled(container.getStartIndex() > 0);
         next.setEnabled(container.getStartIndex() < container.getRealSize() - getPageLength());

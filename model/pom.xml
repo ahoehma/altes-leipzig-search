@@ -9,7 +9,7 @@
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <properties>
-    <org.springframework.data-neo4j.version>2.4.0.BUILD-SNAPSHOT</org.springframework.data-neo4j.version>
+    <org.springframework.data-neo4j.version>2.3.3.RELEASE</org.springframework.data-neo4j.version>
   </properties>
   <dependencies>
     <dependency>

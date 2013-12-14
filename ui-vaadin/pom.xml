@@ -13,7 +13,7 @@
   <properties>
     <org.springframework.security.version>3.1.4.RELEASE</org.springframework.security.version>
     <groovy.version>1.8.5</groovy.version>
-    <vaadin.version>7.1.0</vaadin.version>
+    <vaadin.version>7.1.8</vaadin.version>
     <jetty.port>8080</jetty.port>
     <jetty.secure.port>8443</jetty.secure.port>
     <jetty.version>9.0.4.v20130625</jetty.version>

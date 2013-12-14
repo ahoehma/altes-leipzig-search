@@ -35,8 +35,12 @@ if (path != null) {
 logger("org.springframework", WARN, ["CONSOLE", "FILE"])
 logger("org.springframework.transaction", WARN, ["CONSOLE", "FILE"])
 logger("org.springframework.security", WARN, ["CONSOLE", "FILE"])
+logger("org.springframework.data.neo4j", WARN, ["CONSOLE", "FILE"])
+logger("org.neo4j", WARN, ["CONSOLE", "FILE"])
 logger("com.mymita.al", INFO, ["CONSOLE", "FILE"])
-logger("org.springframework.data.neo4j", DEBUG, ["CONSOLE", "FILE"])
+logger("com.mymita.al.importer", INFO, ["CONSOLE", "FILE"])
+logger("com.mymita.al.ui.admin.AdminUI", WARN, ["CONSOLE", "FILE"])
+logger("com.mymita.al.ui.search.MainUI", WARN, ["CONSOLE", "FILE"])
 
 root(ERROR, ["CONSOLE", "FILE"])
 

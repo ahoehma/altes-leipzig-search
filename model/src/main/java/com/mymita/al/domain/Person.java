@@ -1,17 +1,9 @@
 package com.mymita.al.domain;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Set;
-
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.neo4j.annotation.Fetch;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
-import org.springframework.data.neo4j.annotation.RelatedTo;
-
-import com.google.common.collect.Sets;
 
 @NodeEntity
 @TypeAlias("Person")
@@ -23,25 +15,17 @@ public class Person {
   }
 
   @GraphId
-  private Long           id;
-
+  private Long   id;
   @Indexed(unique = true)
-  private String         code;
-
-  private String         firstName;
-  private String         lastName;
-  private String         birthName;
-  private Gender         gender;
-  private Date           dateOfBirth;
-  private Date           dateOfChristening;
-  private Date           dateOfDeath;
-  private Date           dateOfBuried;
-  private String         description;
-  private String         yearsOfLife;
-
-  @RelatedTo(type = "HAS_TAG")
-  @Fetch
-  private final Set<Tag> tags = Sets.newHashSet();
+  private String code;
+  private String firstName;
+  private String lastName;
+  private String birthName;
+  private Gender gender;
+  private String yearOfBirth;
+  private String yearOfDeath;
+  private String yearsOfLife;
+  private String description;
 
   public Person birthName(final String birthName) {
     this.birthName = birthName;
@@ -50,26 +34,6 @@ public class Person {
 
   public Person code(final String code) {
     this.code = code;
-    return this;
-  }
-
-  public Person dateOfBirth(final Date dateOfBirth) {
-    this.dateOfBirth = dateOfBirth;
-    return this;
-  }
-
-  public Person dateOfBuried(final Date dateOfBuried) {
-    this.dateOfBuried = dateOfBuried;
-    return this;
-  }
-
-  public Person dateOfChristening(final Date dateOfChristening) {
-    this.dateOfChristening = dateOfChristening;
-    return this;
-  }
-
-  public Person dateOfDeath(final Date dateOfDeath) {
-    this.dateOfDeath = dateOfDeath;
     return this;
   }
 
@@ -118,22 +82,6 @@ public class Person {
     return code;
   }
 
-  public Date getDateOfBirth() {
-    return dateOfBirth;
-  }
-
-  public Date getDateOfBuried() {
-    return dateOfBuried;
-  }
-
-  public Date getDateOfChristening() {
-    return dateOfChristening;
-  }
-
-  public Date getDateOfDeath() {
-    return dateOfDeath;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -150,8 +98,12 @@ public class Person {
     return lastName;
   }
 
-  public Set<Tag> getTags() {
-    return tags;
+  public String getYearOfBirth() {
+    return yearOfBirth;
+  }
+
+  public String getYearOfDeath() {
+    return yearOfDeath;
   }
 
   public String getYearsOfLife() {
@@ -173,14 +125,21 @@ public class Person {
 
   @Override
   public String toString() {
-    return "Person [code=" + code + ", firstName=" + firstName + ", lastName=" + lastName + ", gender=" + gender + ", dateOfBirth="
-        + dateOfBirth + ", dateOfChristening=" + dateOfChristening + ", dateOfDeath=" + dateOfDeath + ", dateOfBuried=" + dateOfBuried
-        + ", description=" + description + ", birthName=" + birthName + ", yearsOfLife=" + yearsOfLife + ", tags=" + tags + ", id=" + id
-        + "]";
+    final StringBuilder builder = new StringBuilder();
+    builder.append("Person [id=").append(id).append(", code=").append(code).append(", firstName=").append(firstName).append(", lastName=")
+        .append(lastName).append(", birthName=").append(birthName).append(", gender=").append(gender).append(", yearOfBirth=")
+        .append(yearOfBirth).append(", yearOfDeath=").append(yearOfDeath).append(", yearsOfLife=").append(yearsOfLife)
+        .append(", description=").append(description).append("]");
+    return builder.toString();
   }
 
-  public Person withTag(final Collection<Tag> tags) {
-    this.tags.addAll(tags);
+  public Person yearOfBirth(final String yearOfBirth) {
+    this.yearOfBirth = yearOfBirth;
+    return this;
+  }
+
+  public Person yearOfDeath(final String yearOfDeath) {
+    this.yearOfDeath = yearOfDeath;
     return this;
   }
 
