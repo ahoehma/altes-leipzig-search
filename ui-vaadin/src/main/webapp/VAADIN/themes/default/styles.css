@@ -59,6 +59,10 @@ i.help {
 	font-size: 20px;
 }
 
+.image-preview {
+	font-size: 40px;
+}
+
 .v-table-row.v-selected,.v-table-row-odd.v-selected {
 	background: none;
 	background-color: #444;

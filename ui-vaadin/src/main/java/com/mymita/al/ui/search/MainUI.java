@@ -283,10 +283,14 @@ public class MainUI extends UI {
     imagePanel.setStyleName(Reindeer.PANEL_LIGHT);
     imagePanel.setCaption("Bild/Vorschau");
     imagePanel.setHeight(100, Unit.PERCENTAGE);
-    imagePanel.setWidth(250, Unit.PIXELS);
+    imagePanel.setWidth(220, Unit.PIXELS);
     final VerticalLayout imagePanelLayout = new VerticalLayout();
     imagePanelLayout.setStyleName("image-panel");
     imagePanelLayout.setSizeFull();
+    final Label human = new Label("<i class=\"fi-torso image-preview\"/>", ContentMode.HTML);
+    human.setSizeUndefined();
+    imagePanelLayout.addComponent(human);
+    imagePanelLayout.setComponentAlignment(human, Alignment.MIDDLE_CENTER);
     imagePanel.setContent(imagePanelLayout);
 
     final Panel referencePanel = new Panel();
