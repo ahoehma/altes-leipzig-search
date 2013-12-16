@@ -216,19 +216,27 @@ public class MainUI extends UI {
       @Override
       public Gender convertToModel(final String value, final Class<? extends Gender> targetType, final Locale locale)
           throws com.vaadin.data.util.converter.Converter.ConversionException {
+        if ("m".equals(value)) {
+          return Gender.MALE;
+        }
+        if ("w".equals(value)) {
+          return Gender.FEMALE;
+        }
         return null;
       }
 
       @Override
       public String convertToPresentation(final Gender value, final Class<? extends String> targetType, final Locale locale)
           throws com.vaadin.data.util.converter.Converter.ConversionException {
-        switch (value) {
-        case FEMALE:
-          return "w";
-        case MALE:
-          return "m";
+        if (value != null) {
+          switch (value) {
+          case FEMALE:
+            return "w";
+          case MALE:
+            return "m";
+          }
         }
-        return "";
+        return null;
       }
 
       @Override
