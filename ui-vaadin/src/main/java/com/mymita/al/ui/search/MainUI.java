@@ -241,22 +241,29 @@ public class MainUI extends UI {
 
       @Override
       public String generateDescription(final Component source, final Object itemId, final Object propertyId) {
+        if (itemId == null) {
+          return null;
+        }
         if ("gender".equals(propertyId)) {
           final Gender g = ((Person) itemId).getGender();
-          switch (g) {
-          case FEMALE:
-            return "Frau";
-          case MALE:
-            return "Mann";
+          if (g != null) {
+            switch (g) {
+            case FEMALE:
+              return "Frau";
+            case MALE:
+              return "Mann";
+            }
           }
         }
         if ("yearsOfLife".equals(propertyId)) {
           final String yearsOfLife = ((Person) itemId).getYearsOfLife();
-          if (yearsOfLife.endsWith("*")) {
-            return "Von der Person existiert kein genaues Geburts- bzw. Sterbejahr";
-          }
-          if (yearsOfLife.equals("<1")) {
-            return "Die Person wurde nicht älter als ein Jahr";
+          if (yearsOfLife != null) {
+            if (yearsOfLife.endsWith("*")) {
+              return "Von der Person existiert kein genaues Geburts- bzw. Sterbejahr";
+            }
+            if (yearsOfLife.equals("<1")) {
+              return "Die Person wurde nicht älter als ein Jahr";
+            }
           }
         }
         return null;
