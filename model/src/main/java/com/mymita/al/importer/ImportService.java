@@ -114,9 +114,11 @@ public class ImportService {
         final String yearOfBirth = data[5];
         final String yearOfDeath = data[6];
         final String yearsOfLife = data[7];
-        final String description = Objects.firstNonNull(data[8], "");
+        final String description = data[8];
+        final String reference = data[9];
+        final String link = data[10];
         final Person newPerson = new Person().code(code).lastName(lastName).firstName(firstName).birthName(birthName).gender(gender)
-            .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description);
+            .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description).reference(reference);
         importPerson(newPerson, importListener);
       }
       tx.success();

@@ -26,6 +26,7 @@ public class Person {
   private String yearOfDeath;
   private String yearsOfLife;
   private String description;
+  private String reference;
 
   public Person birthName(final String birthName) {
     this.birthName = birthName;
@@ -98,6 +99,10 @@ public class Person {
     return lastName;
   }
 
+  public String getReference() {
+    return reference;
+  }
+
   public String getYearOfBirth() {
     return yearOfBirth;
   }
@@ -123,13 +128,18 @@ public class Person {
     return this;
   }
 
+  public Person reference(final String reference) {
+    this.reference = reference;
+    return this;
+  }
+
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
     builder.append("Person [id=").append(id).append(", code=").append(code).append(", firstName=").append(firstName).append(", lastName=")
         .append(lastName).append(", birthName=").append(birthName).append(", gender=").append(gender).append(", yearOfBirth=")
         .append(yearOfBirth).append(", yearOfDeath=").append(yearOfDeath).append(", yearsOfLife=").append(yearsOfLife)
-        .append(", description=").append(description).append("]");
+        .append(", description=").append(description).append(", reference=").append(reference).append("]");
     return builder.toString();
   }
 

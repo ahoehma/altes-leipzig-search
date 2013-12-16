@@ -2,7 +2,6 @@ package com.mymita.al.ui.search;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -29,23 +28,28 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbstractSelect.ItemDescriptionGenerator;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Link;
 import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -58,6 +62,8 @@ public class MainUI extends UI {
 
   private static final long   serialVersionUID = -6780876618168616688L;
   private static final Logger LOGGER           = LoggerFactory.getLogger(MainUI.class);
+  private static final String FEMALE           = "♀";
+  private static final String MALE             = "♂";
 
   private static String name(final String value) {
     final String result = Objects.firstNonNull(value, "").replaceAll("'", "").replaceAll("[^\\p{L}\\p{Nd}\\.\\*]", "");
@@ -97,8 +103,24 @@ public class MainUI extends UI {
   private CustomLayout    content;
 
   private Table createResultTable() {
-    final Table results = new Table();
+    final Table results = new Table() {
+      @Override
+      protected String formatPropertyValue(final Object rowId, final Object colId, final com.vaadin.data.Property<?> property) {
+        if (property.getType() == Gender.class) {
+          if (property.getValue() != null) {
+            switch ((Gender) property.getValue()) {
+            case FEMALE:
+              return FEMALE;
+            case MALE:
+              return MALE;
+            }
+          }
+        }
+        return super.formatPropertyValue(rowId, colId, property);
+      };
+    };
     results.setStyleName(Reindeer.TABLE_BORDERLESS);
+    results.addStyleName(Reindeer.TABLE_STRONG);
     results.setWidth(100, Unit.PERCENTAGE);
     results.setHeight(350, Unit.PIXELS);
     results.setSelectable(true);
@@ -108,7 +130,7 @@ public class MainUI extends UI {
     results.addValueChangeListener(new ValueChangeListener() {
       @Override
       public void valueChange(final ValueChangeEvent event) {
-        showResultDetails(content, (Person) event.getProperty().getValue());
+        showResultDetails(content, resultTable, (Person) event.getProperty().getValue());
       }
     });
     return results;
@@ -181,6 +203,7 @@ public class MainUI extends UI {
           notification.setDelayMsec(2000);
           notification.show(Page.getCurrent());
         }
+        showResultDetails(content, resultTable, null);
       }
 
     });
@@ -190,7 +213,7 @@ public class MainUI extends UI {
     content.addComponent(yearOfDeath, "yearOfDeath");
     content.addComponent(search, "search");
     content.addComponent(resultTable, "results");
-    showResultDetails(content, null);
+    showResultDetails(content, resultTable, null);
     setContent(content);
   }
 
@@ -200,92 +223,131 @@ public class MainUI extends UI {
     results.setColumnHeader("birthName", "Geburtsname");
     results.setColumnHeader("lastName", "Nachname");
     results.setColumnHeader("gender", "");
-    results.setColumnHeader("yearOfBirth", "Geburtsjahr");
-    results.setColumnHeader("yearOfDeath", "Sterbejahr");
+    results.setColumnHeader("yearOfBirth", "Geboren");
+    results.setColumnHeader("yearOfDeath", "Gestorben");
     results.setColumnHeader("yearsOfLife", "Alter");
     results.setColumnWidth("firstName", 100);
     results.setColumnWidth("birthName", 100);
     results.setColumnWidth("lastName", 100);
-    results.setColumnWidth("gender", 30);
+    results.setColumnWidth("gender", 35);
     results.setColumnWidth("yearOfBirth", 80);
     results.setColumnWidth("yearOfDeath", 80);
     results.setColumnWidth("yearsOfLife", 50);
+    results.setColumnAlignment("yearOfBirth", Align.CENTER);
+    results.setColumnAlignment("yearOfDeath", Align.CENTER);
+    results.setColumnAlignment("gender", Align.CENTER);
     results.setVisibleColumns(new Object[] { "lastName", "birthName", "firstName", "gender", "yearOfBirth", "yearOfDeath", "yearsOfLife" });
-    results.setConverter("gender", new Converter<String, Gender>() {
+    results.setItemDescriptionGenerator(new ItemDescriptionGenerator() {
 
       @Override
-      public Gender convertToModel(final String value, final Class<? extends Gender> targetType, final Locale locale)
-          throws com.vaadin.data.util.converter.Converter.ConversionException {
-        if ("m".equals(value)) {
-          return Gender.MALE;
-        }
-        if ("w".equals(value)) {
-          return Gender.FEMALE;
-        }
-        return null;
-      }
-
-      @Override
-      public String convertToPresentation(final Gender value, final Class<? extends String> targetType, final Locale locale)
-          throws com.vaadin.data.util.converter.Converter.ConversionException {
-        if (value != null) {
-          switch (value) {
+      public String generateDescription(final Component source, final Object itemId, final Object propertyId) {
+        if ("gender".equals(propertyId)) {
+          final Gender g = ((Person) itemId).getGender();
+          switch (g) {
           case FEMALE:
-            return "w";
+            return "Frau";
           case MALE:
-            return "m";
+            return "Mann";
+          }
+        }
+        if ("yearsOfLife".equals(propertyId)) {
+          final String yearsOfLife = ((Person) itemId).getYearsOfLife();
+          if (yearsOfLife.endsWith("*")) {
+            return "Von der Person existiert kein genaues Geburts- bzw. Sterbejahr";
+          }
+          if (yearsOfLife.equals("<1")) {
+            return "Die Person wurde nicht älter als ein Jahr";
           }
         }
         return null;
       }
-
-      @Override
-      public Class<Gender> getModelType() {
-        return Gender.class;
-      }
-
-      @Override
-      public Class<String> getPresentationType() {
-        return String.class;
-      }
     });
   }
 
-  private void showResultDetails(final CustomLayout content, final Person person) {
-    final Panel infoPanel = new Panel();
-    infoPanel.setCaption("Beschreibung");
-    infoPanel.setHeight(100, Unit.PIXELS);
+  private void showResultDetails(final CustomLayout content, final Table resultTable, final Person person) {
+
+    final Panel descriptionPanel = new Panel();
+    descriptionPanel.setStyleName("description");
+    descriptionPanel.addStyleName(Reindeer.PANEL_LIGHT);
+    descriptionPanel.setCaption("Beschreibung");
+    descriptionPanel.setHeight(130, Unit.PIXELS);
+    descriptionPanel.setWidth(450, Unit.PIXELS);
     final VerticalLayout infoPanelLayout = new VerticalLayout();
+    // infoPanelLayout.setStyleName("description-panel");
+    // infoPanelLayout.setSizeFull();
+    infoPanelLayout.addComponent(new Label("Code: " + (person != null ? person.getCode() : "")));
     infoPanelLayout.addComponent(new Label(person != null ? person.getDescription() : ""));
-    infoPanel.setContent(infoPanelLayout);
+    descriptionPanel.setContent(infoPanelLayout);
+
     final Panel imagePanel = new Panel();
+    imagePanel.setStyleName(Reindeer.PANEL_LIGHT);
+    imagePanel.setCaption("Bild/Vorschau");
     imagePanel.setHeight(100, Unit.PERCENTAGE);
+    imagePanel.setWidth(250, Unit.PIXELS);
     final VerticalLayout imagePanelLayout = new VerticalLayout();
-    imagePanelLayout.addComponent(new Label("Bild/Vorschau"));
+    imagePanelLayout.setStyleName("image-panel");
+    imagePanelLayout.setSizeFull();
     imagePanel.setContent(imagePanelLayout);
-    final GridLayout infos = new GridLayout(2, 5);
+
+    final Panel referencePanel = new Panel();
+    referencePanel.setStyleName(Reindeer.PANEL_LIGHT);
+    referencePanel.setCaption("Quelle / Ersterwähnung");
+    referencePanel.setHeight(40, Unit.PIXELS);
+    referencePanel.setWidth(450, Unit.PIXELS);
+    final VerticalLayout referencePanelLayout = new VerticalLayout();
+    referencePanelLayout.setStyleName("reference-panel");
+    referencePanelLayout.setSizeFull();
+    referencePanelLayout.addComponent(new Label(person != null ? person.getReference() : ""));
+    referencePanel.setContent(referencePanelLayout);
+
+    final GridLayout infos = new GridLayout(2, 3);
     infos.setStyleName("result-details");
     infos.setMargin(new MarginInfo(true, false, false, false));
     infos.setSpacing(true);
     infos.setWidth(100, Unit.PERCENTAGE);
-    infos.addComponent(new Label("Code: " + (person != null ? person.getCode() : "")), 0, 0);
-    infos.addComponent(infoPanel, 0, 1);
-    infos.addComponent(new Label("Quelle / Ersterwähnung"), 0, 2);
-    infos.addComponent(new Label("---"), 0, 3);
-    infos.addComponent(imagePanel, 1, 1, 1, 3);
-    if (person == null) {
-      final Label hint = new Label("Bitte klicken Sie auf ein Ergebnis um weitere Informationen zu erhalten");
-      hint.setStyleName(Reindeer.LABEL_H2);
-      infos.addComponent(hint, 0, 4, 1, 4);
-    } else {
-      final Link contact = new Link();
-      contact.setStyleName(Reindeer.LABEL_H2);
-      contact.setCaption("Für weitere Informationen zu dieser Person bitte hier klicken");
-      contact.setResource(new ExternalResource("mailto:wehlmann@altes-leipzig.de?subject=Detailanfrage für PersonenCode '"
-          + person.getCode() + "'"));
-      infos.addComponent(contact, 0, 4, 1, 4);
+
+    infos.addComponent(descriptionPanel, 0, 1);
+    infos.addComponent(referencePanel, 0, 2);
+    infos.addComponent(imagePanel, 1, 1, 1, 2);
+    infos.setComponentAlignment(imagePanel, Alignment.MIDDLE_RIGHT);
+    infos.setComponentAlignment(descriptionPanel, Alignment.TOP_LEFT);
+    infos.setComponentAlignment(referencePanel, Alignment.BOTTOM_LEFT);
+    infos.setRowExpandRatio(0, 0);
+
+    content.removeComponent("help");
+    final Label icon = new Label("<i class=\"fi-info help\"/>", ContentMode.HTML);
+    if (resultTable.size() == 0) {
+      final Label hint = new Label("Bitte starten Sie die Suche.");
+      hint.setStyleName("hint");
+      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
+      hintLayout.setSpacing(true);
+      hintLayout.setHeight(40, Unit.PIXELS);
+      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
+      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
+      content.addComponent(hintLayout, "help");
+    } else if (resultTable.size() > 0 && person == null) {
+      final Label hint = new Label("Bitte klicken Sie auf ein Ergebnis um weitere Informationen zu erhalten.");
+      hint.setStyleName("hint");
+      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
+      hintLayout.setSpacing(true);
+      hintLayout.setHeight(40, Unit.PIXELS);
+      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
+      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
+      content.addComponent(hintLayout, "help");
+    } else if (resultTable.size() > 0 && person != null) {
+      final Label hint = new Label("Klicken Sie bitte hier um weitere Informationen zur gewählten Person zu erfragen");
+      hint.setStyleName("hint");
+      hint.addStyleName("contact");
+      new BrowserWindowOpener(new ExternalResource("mailto:wehlmann@altes-leipzig.de?subject=Detailanfrage für PersonenCode '"
+          + person.getCode() + "'")).extend(hint);
+      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
+      hintLayout.setSpacing(true);
+      hintLayout.setHeight(40, Unit.PIXELS);
+      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
+      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
+      content.addComponent(hintLayout, "help");
     }
-    content.removeComponent("description");
-    content.addComponent(infos, "description");
+    content.removeComponent("details");
+    content.addComponent(infos, "details");
   }
 }
