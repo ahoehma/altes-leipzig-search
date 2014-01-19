@@ -23,8 +23,7 @@
     </dependency>
     <dependency>
       <groupId>cglib</groupId>
-      <artifactId>cglib</artifactId>
-      <version>2.2.2</version>
+      <artifactId>cglib-nodep</artifactId>
     </dependency>
     <dependency>
       <groupId>com.googlecode.jcsv</groupId>
@@ -48,10 +47,15 @@
       <artifactId>joda-time</artifactId>
       <version>2.3</version>
     </dependency>
+    <!-- tests -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.8.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
