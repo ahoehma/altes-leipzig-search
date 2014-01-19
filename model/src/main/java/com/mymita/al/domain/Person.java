@@ -7,7 +7,6 @@ import org.springframework.data.neo4j.annotation.NodeEntity;
 
 @NodeEntity
 @TypeAlias("Person")
-@Indexed
 public class Person {
 
   public enum Gender {
@@ -19,7 +18,9 @@ public class Person {
   @Indexed(unique = true)
   private String code;
   private String firstName;
+  @Indexed
   private String lastName;
+  @Indexed
   private String birthName;
   private Gender gender;
   private String yearOfBirth;
