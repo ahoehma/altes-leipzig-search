@@ -21,7 +21,7 @@
 
   <http auto-config="true">
     <http-basic/>
-    <intercept-url pattern="/admin/**" access="ROLE_ADMIN" requires-channel="https"/>
+    <intercept-url pattern="/admin/**" access="ROLE_ADMIN" requires-channel="any"/>
   </http>
 
   <beans:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler">
