@@ -7,8 +7,9 @@
 		</encoder>
 	</appender>
 
-	<logger name="org.springframework.data.neo4j" level="DEBUG" />
-	<logger name="org.neo4j" level="DEBUG" />
+	<logger name="org.springframework.data.neo4j" level="WARN" />
+	<logger name="org.neo4j" level="WARN" />
+  <logger name="com.mymita.al" level="DEBUG" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

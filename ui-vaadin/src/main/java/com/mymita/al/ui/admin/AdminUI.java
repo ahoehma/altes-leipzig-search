@@ -15,8 +15,8 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Person.Gender;
-import com.mymita.al.importer.ImportService;
-import com.mymita.al.importer.ImportService.CountingImportListener;
+import com.mymita.al.importer.CountingImportListener;
+import com.mymita.al.importer.PersonImportService;
 import com.mymita.al.repository.PersonRepository;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -52,7 +52,7 @@ public class AdminUI extends UI {
 
     private static final long serialVersionUID = -8775965777754450989L;
 
-    private File              file;
+    private File file;
     private final ProgressBar progressBar;
 
     public CsvUploader(final ProgressBar progressBar) {
@@ -86,11 +86,11 @@ public class AdminUI extends UI {
   @Configurable
   static class PersonImportWorker extends Thread {
 
-    private final File        file;
+    private final File file;
     private final ProgressBar progressBar;
 
     @Autowired
-    transient ImportService   importer;
+    transient PersonImportService importer;
 
     /**
      * @param csvFile
@@ -106,10 +106,10 @@ public class AdminUI extends UI {
     @Override
     public void run() {
       try {
-        importer.importPersons(file, new CountingImportListener<Object>() {
+        importer.importPersons(file, new CountingImportListener<Person>() {
 
           @Override
-          public void onImport(final Object object) {
+          public void onImport(final Person object) {
             super.onImport(object);
             if (object instanceof Person) {
               final int numberOfImportedPersons = count(object);
@@ -136,11 +136,11 @@ public class AdminUI extends UI {
     }
   }
 
-  private static final long   serialVersionUID = -2393645969797715398L;
-  private static final Logger LOGGER           = LoggerFactory.getLogger(AdminUI.class);
+  private static final long serialVersionUID = -2393645969797715398L;
+  private static final Logger LOGGER = LoggerFactory.getLogger(AdminUI.class);
 
   @Autowired
-  transient PersonRepository  personRepository;
+  transient PersonRepository personRepository;
 
   private void addCreatePerson(final VerticalLayout result) {
     final FormLayout addLayout = new FormLayout();

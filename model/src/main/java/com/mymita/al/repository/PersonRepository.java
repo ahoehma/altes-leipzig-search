@@ -40,6 +40,8 @@ public interface PersonRepository extends GraphRepository<Person>, NamedIndexRep
   @Deprecated
   Page<Person> findByLastNameLikeIgnoreCaseAndBirthNameLikeIgnoreCase(final String lastName, String birthName, final Pageable page);
 
+  Person findByPersonCode(String code);
+
   /**
    * Find person by {@link Person#getYearOfBirth()}.
    * 

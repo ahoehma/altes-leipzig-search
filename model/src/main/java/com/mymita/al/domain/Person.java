@@ -14,9 +14,9 @@ public class Person {
   }
 
   @GraphId
-  private Long   id;
+  private Long id;
   @Indexed(unique = true)
-  private String code;
+  private String personCode;
   private String firstName;
   @Indexed
   private String lastName;
@@ -31,11 +31,6 @@ public class Person {
 
   public Person birthName(final String birthName) {
     this.birthName = birthName;
-    return this;
-  }
-
-  public Person code(final String code) {
-    this.code = code;
     return this;
   }
 
@@ -56,11 +51,11 @@ public class Person {
       return false;
     }
     final Person other = (Person) obj;
-    if (code == null) {
-      if (other.code != null) {
+    if (personCode == null) {
+      if (other.personCode != null) {
         return false;
       }
-    } else if (!code.equals(other.code)) {
+    } else if (!personCode.equals(other.personCode)) {
       return false;
     }
     return true;
@@ -80,10 +75,6 @@ public class Person {
     return birthName;
   }
 
-  public String getCode() {
-    return code;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -98,6 +89,10 @@ public class Person {
 
   public String getLastName() {
     return lastName;
+  }
+
+  public String getPersonCode() {
+    return personCode;
   }
 
   public String getReference() {
@@ -120,12 +115,17 @@ public class Person {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (code == null ? 0 : code.hashCode());
+    result = prime * result + (personCode == null ? 0 : personCode.hashCode());
     return result;
   }
 
   public Person lastName(final String lastName) {
     this.lastName = lastName;
+    return this;
+  }
+
+  public Person personCode(final String code) {
+    this.personCode = code;
     return this;
   }
 
@@ -137,10 +137,10 @@ public class Person {
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
-    builder.append("Person [id=").append(id).append(", code=").append(code).append(", firstName=").append(firstName).append(", lastName=")
-        .append(lastName).append(", birthName=").append(birthName).append(", gender=").append(gender).append(", yearOfBirth=")
-        .append(yearOfBirth).append(", yearOfDeath=").append(yearOfDeath).append(", yearsOfLife=").append(yearsOfLife)
-        .append(", description=").append(description).append(", reference=").append(reference).append("]");
+    builder.append("Person [id=").append(id).append(", personCode=").append(personCode).append(", firstName=").append(firstName)
+        .append(", lastName=").append(lastName).append(", birthName=").append(birthName).append(", gender=").append(gender)
+        .append(", yearOfBirth=").append(yearOfBirth).append(", yearOfDeath=").append(yearOfDeath).append(", yearsOfLife=")
+        .append(yearsOfLife).append(", description=").append(description).append(", reference=").append(reference).append("]");
     return builder.toString();
   }
 

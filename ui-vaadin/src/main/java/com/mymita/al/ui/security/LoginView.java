@@ -21,50 +21,48 @@ import com.vaadin.ui.TextField;
 @Configurable
 public class LoginView extends FormLayout implements View {
 
-	private final TextField loginField = new TextField("Login");
-	private final PasswordField passwordField = new PasswordField("Password");
+  private final TextField loginField = new TextField("Login");
+  private final PasswordField passwordField = new PasswordField("Password");
 
-	@Autowired
-	transient AuthenticationManager authenticationManager;
+  @Autowired
+  transient AuthenticationManager authenticationManager;
 
-	public LoginView() {
-		setMargin(true);
-		addComponent(loginField);
-		addComponent(passwordField);
-		final Button button = new Button("Login");
-		button.addClickListener(new ClickListener() {
-			@Override
-			public void buttonClick(final ClickEvent clickEvent) {
-				authenticate(Objects.firstNonNull(loginField.getValue(), ""),
-						Objects.firstNonNull(passwordField.getValue(), ""));
-				loginField.setValue("");
-				passwordField.setValue("");
-			}
-		});
-		addComponent(button);
-	}
+  public LoginView() {
+    setMargin(true);
+    addComponent(loginField);
+    addComponent(passwordField);
+    final Button button = new Button("Login");
+    button.addClickListener(new ClickListener() {
+      @Override
+      public void buttonClick(final ClickEvent clickEvent) {
+        authenticate(Objects.firstNonNull(loginField.getValue(), ""), Objects.firstNonNull(passwordField.getValue(), ""));
+        loginField.setValue("");
+        passwordField.setValue("");
+      }
+    });
+    addComponent(button);
+  }
 
-	private void authenticate(String username, String password) {
-		final UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-				username.trim(), password);
-		Authentication authResult = null;
-		try {
-			authResult = authenticationManager.authenticate(authRequest);
-			if (authResult == null) {
-				// return immediately as subclass has indicated that it hasn't
-				// completed authentication
-				return;
-			}
-		} catch (AuthenticationException failed) {
-			// Authentication failed
-			SecurityContextHolder.clearContext();
-			return;
-		}
-		SecurityContextHolder.getContext().setAuthentication(authResult);
-	}
+  private void authenticate(final String username, final String password) {
+    final UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username.trim(), password);
+    Authentication authResult = null;
+    try {
+      authResult = authenticationManager.authenticate(authRequest);
+      if (authResult == null) {
+        // return immediately as subclass has indicated that it hasn't
+        // completed authentication
+        return;
+      }
+    } catch (final AuthenticationException failed) {
+      // Authentication failed
+      SecurityContextHolder.clearContext();
+      return;
+    }
+    SecurityContextHolder.getContext().setAuthentication(authResult);
+  }
 
-	@Override
-	public void enter(final ViewChangeEvent event) {
+  @Override
+  public void enter(final ViewChangeEvent event) {
 
-	}
+  }
 }

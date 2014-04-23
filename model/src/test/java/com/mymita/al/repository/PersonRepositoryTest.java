@@ -1,11 +1,11 @@
 package com.mymita.al.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.annotation.QueryType;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.data.neo4j.support.conversion.EntityResultConverter;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,6 +14,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -27,15 +28,21 @@ import com.mymita.al.domain.Person.Gender;
 public class PersonRepositoryTest extends AbstractTestNGSpringContextTests {
 
   @Autowired
-  transient PersonRepository           personRepository;
+  transient PersonRepository personRepository;
   @Autowired
-  transient Neo4jTemplate              neo4jTemplate;
+  transient Neo4jTemplate neo4jTemplate;
   @Autowired
   transient PlatformTransactionManager transactionManager;
 
   @Test
   public void findAllByProperty() throws Exception {
     MatcherAssert.assertThat(Lists.newArrayList(personRepository.findAllByPropertyValue("lastName", "Höhmann")).size(), Matchers.is(1));
+  }
+
+  @Test
+  public void findByCode() throws Exception {
+    Assert.assertNotNull(personRepository.findByPersonCode("0001"));
+    Assert.assertNull(personRepository.findByPersonCode("0002"));
   }
 
   @Test
@@ -66,15 +73,16 @@ public class PersonRepositoryTest extends AbstractTestNGSpringContextTests {
     final String yearOfBirthValue = "1912";
     final String q = String.format("START person=node:__types__(className='Person') " + "WHERE (person.birthName =~ '(?i)%s' "
         + "OR person.lastName =~ '(?i)%s' OR person.yearOfBirth = '%s') " + "RETURN person", nameValue, nameValue, yearOfBirthValue);
-    final List<Person> persons = Lists.newArrayList(neo4jTemplate.getGraphDatabase().queryEngineFor(QueryType.Cypher).query(q, null)
-        .to(Person.class, new EntityResultConverter<Object, Person>(neo4jTemplate.getConversionService(), neo4jTemplate)).iterator());
+    final List<Person> persons = Lists.newArrayList(neo4jTemplate.getGraphDatabase().queryEngine().query(q, null)
+        .to(Person.class, new EntityResultConverter<Map<String, Object>, Person>(neo4jTemplate.getConversionService(), neo4jTemplate))
+        .iterator());
     MatcherAssert.assertThat(persons.size(), Matchers.is(1));
   }
 
   @BeforeMethod
   public void preChecks() {
     // Neo4jHelper.cleanDb(neo4jTemplate);
-    personRepository.save(new Person().firstName("Andreas").lastName("Höhmann").birthName("Höhmann").gender(Gender.MALE).code("0001")
+    personRepository.save(new Person().firstName("Andreas").lastName("Höhmann").birthName("Höhmann").gender(Gender.MALE).personCode("0001")
         .yearOfBirth("1976"));
     MatcherAssert.assertThat(personRepository.count(), Matchers.is(1L));
     MatcherAssert.assertThat(Iterables.getFirst(personRepository.findAll(), null).getLastName(), Matchers.is("Höhmann"));

@@ -33,22 +33,54 @@
     <param-name>productionMode</param-name>
     <param-value>true</param-value>
   </context-param>
+
   <servlet>
-    <servlet-name>Main</servlet-name>
+    <servlet-name>PersonSearch</servlet-name>
     <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
     <init-param>
       <param-name>UI</param-name>
-      <param-value>com.mymita.al.ui.search.MainUI</param-value>
+      <param-value>com.mymita.al.ui.search.person.Search</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
-    <servlet-name>Main</servlet-name>
+    <servlet-name>PersonSearch</servlet-name>
     <url-pattern>/main/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>Main</servlet-name>
+    <servlet-name>PersonSearch</servlet-name>
+    <url-pattern>/search/person/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>PersonSearch</servlet-name>
     <url-pattern>/VAADIN/*</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MarriageSearch</servlet-name>
+    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+    <init-param>
+      <param-name>UI</param-name>
+      <param-value>com.mymita.al.ui.search.marriage.Search</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MarriageSearch</servlet-name>
+    <url-pattern>/search/marriage/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ChristeningSearch</servlet-name>
+    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+    <init-param>
+      <param-name>UI</param-name>
+      <param-value>com.mymita.al.ui.search.christening.Search</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ChristeningSearch</servlet-name>
+    <url-pattern>/search/christening/*</url-pattern>
+  </servlet-mapping>
+
   <servlet>
     <servlet-name>Admin</servlet-name>
     <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>

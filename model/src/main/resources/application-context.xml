@@ -2,16 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
   xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	                  http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
-		              http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-		              http://www.springframework.org/schema/data/neo4j http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd">
-
+	                    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+    		              http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    		              http://www.springframework.org/schema/data/neo4j http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd">
   <context:annotation-config />
   <context:spring-configured />
   <context:component-scan base-package="com.mymita.al" />
-
   <tx:annotation-driven mode="proxy" transaction-manager="transactionManager" />
-  <neo4j:repositories base-package="com.mymita.al.repository" />
-  <neo4j:config storeDirectory="#{systemProperties['user.home']}/altesleipzig.db" />
-
+  <neo4j:repositories base-package="com.mymita.al.repository"/>
+  <neo4j:config base-package="com.mymita.al.domain" storeDirectory="#{systemProperties['user.home']}/altesleipzig.db" />
 </beans>
