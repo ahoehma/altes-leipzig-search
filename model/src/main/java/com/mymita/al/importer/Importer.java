@@ -32,8 +32,8 @@ public class Importer {
         new CountingImportListener<Christening>() {
 
           @Override
-          public void onImport(final Christening object) {
-            super.onImport(object);
+          public void progressImport(final Christening object) {
+            super.progressImport(object);
             LOGGER.debug("[{}/{}] Imported christening {}", count(object), max(object), object);
           }
         });
@@ -44,8 +44,8 @@ public class Importer {
         new CountingImportListener<Marriage>() {
 
           @Override
-          public void onImport(final Marriage object) {
-            super.onImport(object);
+          public void progressImport(final Marriage object) {
+            super.progressImport(object);
             LOGGER.debug("[{}/{}] Imported marriage {}", count(object), max(object), object);
           }
         });
@@ -56,8 +56,8 @@ public class Importer {
         new CountingImportListener<Person>() {
 
           @Override
-          public void onImport(final Person object) {
-            super.onImport(object);
+          public void progressImport(final Person object) {
+            super.progressImport(object);
             LOGGER.debug("[{}/{}] Imported person {}", count(object), max(object), object);
           }
         });

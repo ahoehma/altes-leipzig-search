@@ -1,90 +1,111 @@
 package com.mymita.al.repository;
 
-import java.util.List;
-import java.util.Map;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
-import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.neo4j.support.Neo4jTemplate;
-import org.springframework.data.neo4j.support.conversion.EntityResultConverter;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
-import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.orm.jpa.EntityScan;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
+import org.springframework.test.context.transaction.BeforeTransaction;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Person.Gender;
 
-@ContextConfiguration(locations = { "/context-application.xml" })
-@TestExecutionListeners({ TransactionalTestExecutionListener.class })
-public class PersonRepositoryTest extends AbstractTestNGSpringContextTests {
+@SpringApplicationConfiguration(classes = PersonRepositoryTest.TestConfig.class)
+public class PersonRepositoryTest extends AbstractTransactionalTestNGSpringContextTests {
+
+  @Configuration
+  @EnableAutoConfiguration
+  @ComponentScan
+  @EnableJpaRepositories(basePackages = { "com.mymita.al.repository" })
+  @EntityScan(basePackages = { "com.mymita.al.domain" })
+  static class TestConfig {
+  }
 
   @Autowired
   transient PersonRepository personRepository;
-  @Autowired
-  transient Neo4jTemplate neo4jTemplate;
-  @Autowired
-  transient PlatformTransactionManager transactionManager;
-
-  @Test
-  public void findAllByProperty() throws Exception {
-    MatcherAssert.assertThat(Lists.newArrayList(personRepository.findAllByPropertyValue("lastName", "Höhmann")).size(), Matchers.is(1));
-  }
-
-  @Test
-  public void findByCode() throws Exception {
-    Assert.assertNotNull(personRepository.findByPersonCode("0001"));
-    Assert.assertNull(personRepository.findByPersonCode("0002"));
-  }
-
-  @Test
-  public void findByDateOfBirth() throws Exception {
-    MatcherAssert.assertThat(Lists.newArrayList(personRepository.findByYearOfBirth("1900", null)).size(), Matchers.is(0));
-    MatcherAssert.assertThat(Lists.newArrayList(personRepository.findByYearOfBirth("1976", null)).size(), Matchers.is(1));
-  }
-
-  @Test
-  @Transactional
-  public void findByIndexedLastName() throws Exception {
-    MatcherAssert.assertThat(Lists.newArrayList(personRepository.findAllByPropertyValue("lastName", "Höhmann")).size(), Matchers.is(1));
-  }
 
   @Test
   public void findByLastName() throws Exception {
-    MatcherAssert.assertThat(Lists.newArrayList(personRepository.findByLastName("Höhmann", null)).size(), Matchers.is(1));
-  }
-
-  @Test(enabled = false)
-  public void findByLastNameIgnoreCaseAndBirthNameLikeIgnoreCase() throws Exception {
-    MatcherAssert.assertThat(Lists.newArrayList(personRepository.findByLastNameLikeIgnoreCase("höhmann", null)).size(), Matchers.is(1));
+    assertThat(personRepository.findByLastName("Höhmann").size(), is(1));
   }
 
   @Test
-  public void findByQuery() throws Exception {
-    final String nameValue = "Höhmann";
-    final String yearOfBirthValue = "1912";
-    final String q = String.format("START person=node:__types__(className='Person') " + "WHERE (person.birthName =~ '(?i)%s' "
-        + "OR person.lastName =~ '(?i)%s' OR person.yearOfBirth = '%s') " + "RETURN person", nameValue, nameValue, yearOfBirthValue);
-    final List<Person> persons = Lists.newArrayList(neo4jTemplate.getGraphDatabase().queryEngine().query(q, null)
-        .to(Person.class, new EntityResultConverter<Map<String, Object>, Person>(neo4jTemplate.getConversionService(), neo4jTemplate))
-        .iterator());
-    MatcherAssert.assertThat(persons.size(), Matchers.is(1));
+  public void findByLastNameContainingAndBirthNameContainingAllIgnoringCase() throws Exception {
+    assertThat(personRepository.findByLastNameContainingAndBirthNameContainingAllIgnoringCase("höhmann", "höh").size(), is(1));
+    assertThat(personRepository.findByLastNameContainingAndBirthNameContainingAllIgnoringCase("", "höhmann").size(), is(1));
+    assertThat(personRepository.findByLastNameContainingAndBirthNameContainingAllIgnoringCase("mann", "").size(), is(1));
   }
 
-  @BeforeMethod
-  public void preChecks() {
-    // Neo4jHelper.cleanDb(neo4jTemplate);
+  @Test
+  public void findByLastNameContainingIgnoreCase() throws Exception {
+    assertThat(personRepository.findByLastNameContainingIgnoreCase("höhmann").size(), is(1));
+  }
+
+  @Test
+  public void findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath() throws Exception {
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("höhmann", "", "",
+            "").size(), is(1));
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("öhm", "", "", "")
+            .size(), is(1));
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("höh", "", "", "")
+            .size(), is(1));
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("höhmann", "",
+            "1976", "").size(), is(1));
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("", "höhmann", "",
+            "").size(), is(1));
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("", "öhm", "", "")
+            .size(), is(1));
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("", "höh", "", "")
+            .size(), is(1));
+    assertThat(
+        personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("", "höhmann",
+            "1976", "").size(), is(1));
+  }
+
+  @Test
+  public void findByPersonCode() throws Exception {
+    assertNotNull(personRepository.findByPersonCode("0001"));
+    assertNull(personRepository.findByPersonCode("0002"));
+  }
+
+  @Test
+  public void findByYearOfBirth() throws Exception {
+    assertThat(personRepository.findByYearOfBirth("1900").size(), is(0));
+    assertThat(personRepository.findByYearOfBirth("1976").size(), is(1));
+  }
+
+  @BeforeTransaction
+  public void setupData() throws Exception {
+    deleteFromTables("person");
     personRepository.save(new Person().firstName("Andreas").lastName("Höhmann").birthName("Höhmann").gender(Gender.MALE).personCode("0001")
         .yearOfBirth("1976"));
-    MatcherAssert.assertThat(personRepository.count(), Matchers.is(1L));
-    MatcherAssert.assertThat(Iterables.getFirst(personRepository.findAll(), null).getLastName(), Matchers.is("Höhmann"));
+    assertThat(personRepository.count(), Matchers.is(1L));
+    assertThat(Iterables.getFirst(personRepository.findAll(), null).getLastName(), is("Höhmann"));
+  }
+
+  @Test(expectedExceptions = { DataIntegrityViolationException.class }, expectedExceptionsMessageRegExp = ".*constraint \\[UNIQUE_PERSON_CODE\\].*")
+  public void unqiuePersonCode() throws Exception {
+    // same person code 0001
+    personRepository.save(new Person().firstName("Peter").lastName("Lustig").birthName("Lustig").gender(Gender.MALE).personCode("0001")
+        .yearOfBirth("1912"));
   }
 }

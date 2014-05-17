@@ -1,24 +1,24 @@
 package com.mymita.al.domain;
 
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
-@NodeEntity
-@TypeAlias("Marriage")
+@Entity
+@Table(uniqueConstraints = { @UniqueConstraint(name = "unique_family_code", columnNames = { "familyCode" }) })
 public class Marriage {
 
-  @GraphId
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-  @Indexed(unique = true)
   private String familyCode;
   private String personCode1;
   private String personCode2;
-  @Indexed
   private String lastNamePerson1;
   private String firstNamePerson1;
-  @Indexed
   private String birthNamePerson2;
   private String firstNamePerson2;
   private String professionPerson1;
@@ -208,12 +208,12 @@ public class Marriage {
   public String toString() {
     final StringBuilder builder = new StringBuilder();
     builder.append("Marriage [id=").append(id).append(", familyCode=").append(familyCode).append(", personCode1=").append(personCode1)
-    .append(", personCode2=").append(personCode2).append(", lastNamePerson1=").append(lastNamePerson1).append(", firstNamePerson1=")
-    .append(firstNamePerson1).append(", birthNamePerson2=").append(birthNamePerson2).append(", firstNamePerson2=")
-    .append(firstNamePerson2).append(", professionPerson1=").append(professionPerson1).append(", professionPerson2=")
-    .append(professionPerson2).append(", cityPerson1=").append(cityPerson1).append(", cityPerson2=").append(cityPerson2)
-    .append(", dateMarriage=").append(dateMarriage).append(", church=").append(church).append(", reference=").append(reference)
-    .append(", periodMarriage=").append(periodMarriage).append(", year=").append(year).append("]");
+        .append(", personCode2=").append(personCode2).append(", lastNamePerson1=").append(lastNamePerson1).append(", firstNamePerson1=")
+        .append(firstNamePerson1).append(", birthNamePerson2=").append(birthNamePerson2).append(", firstNamePerson2=")
+        .append(firstNamePerson2).append(", professionPerson1=").append(professionPerson1).append(", professionPerson2=")
+        .append(professionPerson2).append(", cityPerson1=").append(cityPerson1).append(", cityPerson2=").append(cityPerson2)
+        .append(", dateMarriage=").append(dateMarriage).append(", church=").append(church).append(", reference=").append(reference)
+        .append(", periodMarriage=").append(periodMarriage).append(", year=").append(year).append("]");
     return builder.toString();
   }
 

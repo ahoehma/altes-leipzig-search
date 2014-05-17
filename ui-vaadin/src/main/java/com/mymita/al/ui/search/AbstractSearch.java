@@ -2,11 +2,8 @@ package com.mymita.al.ui.search;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Lists;
 import com.google.gwt.thirdparty.guava.common.base.Objects;
@@ -28,27 +25,14 @@ public abstract class AbstractSearch<T> extends UI {
   private static final long serialVersionUID = -2765748679653124722L;
 
   protected static String name(final String value) {
-    final String result = Objects.firstNonNull(value, "").replaceAll("'", "").replaceAll("[^\\p{L}\\p{Nd}\\.\\*]", "");
-    if (!Strings.isNullOrEmpty(result)) {
-      try {
-        Pattern.compile(result);
-      } catch (final PatternSyntaxException e) {
-        return null;
-      }
-      if (result.length() < 3) {
-        return null;
-      }
-      if (StringUtils.countOccurrencesOf(result, "*") > 1) {
-        return null;
-      }
-      if (StringUtils.countOccurrencesOf(result, ".") > 1) {
-        return null;
-      }
+    final String result = Objects.firstNonNull(value, "").replaceAll("'", "").replaceAll("%", "");
+    if (result.length() < 3) {
+      return null;
     }
     return result;
   }
 
-  protected static Integer number(final String value) {
+  protected static Number number(final String value) {
     if (!Strings.isNullOrEmpty(value)) {
       try {
         return Integer.valueOf(value);

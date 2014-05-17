@@ -1,26 +1,26 @@
 package com.mymita.al.domain;
 
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.NodeEntity;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
-@NodeEntity
-@TypeAlias("Person")
+@Entity
+@Table(uniqueConstraints = { @UniqueConstraint(name = "unique_person_code", columnNames = { "personCode" }) })
 public class Person {
 
   public enum Gender {
     MALE, FEMALE
   }
 
-  @GraphId
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
-  @Indexed(unique = true)
   private String personCode;
   private String firstName;
-  @Indexed
   private String lastName;
-  @Indexed
   private String birthName;
   private Gender gender;
   private String yearOfBirth;

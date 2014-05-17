@@ -2,23 +2,18 @@ package com.mymita.al.ui.search.person;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.neo4j.support.Neo4jTemplate;
-import org.springframework.data.neo4j.support.conversion.EntityResultConverter;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Person.Gender;
+import com.mymita.al.repository.PersonRepository;
 import com.mymita.al.ui.search.AbstractSearch;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -55,7 +50,7 @@ public class Search extends AbstractSearch<Person> {
   private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
   @Autowired
-  transient Neo4jTemplate template;
+  transient PersonRepository personRepository;
 
   public Search() {
     super(Person.class, new ClassPathResource("search.html", Search.class));
@@ -134,36 +129,24 @@ public class Search extends AbstractSearch<Person> {
       @Override
       public void buttonClick(final ClickEvent event) {
         final String nameValue = name(name.getValue());
-        final Integer yearOfBirthValue = number(yearOfBirth.getValue());
-        final Integer yearOfDeathValue = number(yearOfDeath.getValue());
-        final List<String> filter = Lists.newArrayList();
-        final Map<String, Object> params = Maps.newHashMap();
-        if (!Strings.isNullOrEmpty(nameValue)) {
-          filter.add(String.format("(person.birthName =~ '(?i)%1$s' OR person.lastName =~ '(?i)%1$s')", nameValue));
+        final String yearOfBirthValue = String.valueOf(number(yearOfBirth.getValue()));
+        final String yearOfDeathValue = String.valueOf(number(yearOfDeath.getValue()));
+        final boolean withName = !Strings.isNullOrEmpty(nameValue);
+        final boolean withYear = !Strings.isNullOrEmpty(yearOfBirthValue) || !Strings.isNullOrEmpty(yearOfDeathValue);
+        if (withName && withYear) {
+          showHits(personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath(nameValue,
+              nameValue, yearOfBirthValue, yearOfDeathValue));
+          return;
         }
-        if (yearOfBirthValue != null) {
-          filter.add(String.format("(person.yearOfBirth = {yearOfBirth})", yearOfBirthValue));
-          params.put("yearOfBirth", yearOfBirthValue.toString());
+        if (withName) {
+          showHits(personRepository.findByLastNameContainingAndBirthNameContainingAllIgnoringCase(nameValue, nameValue));
+          return;
         }
-        if (yearOfDeathValue != null) {
-          filter.add(String.format("(person.yearOfDeath = {yearOfDeath})", yearOfDeathValue));
-          params.put("yearOfDeath", yearOfDeathValue.toString());
+        if (withYear) {
+          showHits(personRepository.findByYearOfBirthOrYearOfDeath(yearOfBirthValue, yearOfDeathValue));
+          return;
         }
-        if (filter.isEmpty()) {
-          showHits(Lists.<Person> newArrayList());
-        } else {
-          final String cypherQuery = "START person=node(*) WHERE " + Joiner.on(" AND ").join(filter) + " RETURN person";
-          LOGGER.debug(cypherQuery);
-          final Transaction tx = template.getGraphDatabase().beginTx();
-          try {
-            showHits(Lists.newArrayList(template.getGraphDatabase().queryEngine().query(cypherQuery, params)
-                .to(Person.class, new EntityResultConverter<Map<String, Object>, Person>(template.getConversionService(), template))
-                .iterator()));
-          } finally {
-            tx.finish();
-            tx.close();
-          }
-        }
+        showHits(Lists.<Person> newArrayList());
       }
     });
     search.setClickShortcut(KeyCode.ENTER);
@@ -197,7 +180,7 @@ public class Search extends AbstractSearch<Person> {
     resultTable.setColumnAlignment("yearOfDeath", Align.CENTER);
     resultTable.setColumnAlignment("gender", Align.CENTER);
     resultTable.setVisibleColumns(new Object[] { "lastName", "birthName", "firstName", "gender", "yearOfBirth", "yearOfDeath",
-        "yearsOfLife" });
+    "yearsOfLife" });
     resultTable.setItemDescriptionGenerator(new ItemDescriptionGenerator() {
 
       @Override

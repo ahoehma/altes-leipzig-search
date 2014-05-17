@@ -1,22 +1,17 @@
 package com.mymita.al.ui.search.marriage;
 
 import java.util.List;
-import java.util.Map;
 
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.neo4j.support.Neo4jTemplate;
-import org.springframework.data.neo4j.support.conversion.EntityResultConverter;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.mymita.al.domain.Marriage;
+import com.mymita.al.repository.MarriageRepository;
 import com.mymita.al.ui.search.AbstractSearch;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -57,7 +52,7 @@ public class Search extends AbstractSearch<Marriage> {
   }
 
   @Autowired
-  transient Neo4jTemplate template;
+  transient MarriageRepository marriageRepository;
 
   public Search() {
     super(Marriage.class, new ClassPathResource("search.html", Search.class));
@@ -82,31 +77,23 @@ public class Search extends AbstractSearch<Marriage> {
       @Override
       public void buttonClick(final ClickEvent event) {
         final String nameValue = name(name.getValue());
-        final Integer yearValue = number(year.getValue());
-        final List<String> filter = Lists.newArrayList();
-        final Map<String, Object> params = Maps.newHashMap();
-        if (!Strings.isNullOrEmpty(nameValue)) {
-          filter.add(String.format("(marriage.lastNamePerson1 =~ '(?i)%1$s' OR marriage.birthNamePerson2 =~ '(?i)%1$s')", nameValue));
+        final String yearValue = String.valueOf(number(year.getValue()));
+        final boolean withName = !Strings.isNullOrEmpty(nameValue);
+        final boolean withYear = !Strings.isNullOrEmpty(yearValue);
+        if (withName && withYear) {
+          showHits(marriageRepository.findByLastNamePerson1ContainingIgnoreCaseOrBirthNamePerson2ContainingIgnoreCaseAndYear(nameValue,
+              nameValue, yearValue));
+          return;
         }
-        if (yearValue != null) {
-          filter.add(String.format("(marriage.year = {year})", yearValue));
-          params.put("year", yearValue.toString());
+        if (withName) {
+          showHits(marriageRepository.findByLastNamePerson1ContainingOrBirthNamePerson2ContainingAllIgnoreCase(nameValue, nameValue));
+          return;
         }
-        if (filter.isEmpty()) {
-          showHits(Lists.<Marriage> newArrayList());
-        } else {
-          final String cypherQuery = "START marriage=node(*) WHERE " + Joiner.on(" AND ").join(filter) + " RETURN marriage";
-          LOGGER.debug(cypherQuery);
-          final Transaction tx = template.getGraphDatabase().beginTx();
-          try {
-            showHits(Lists.newArrayList(template.getGraphDatabase().queryEngine().query(cypherQuery, params)
-                .to(Marriage.class, new EntityResultConverter<Map<String, Object>, Marriage>(template.getConversionService(), template))
-                .iterator()));
-          } finally {
-            tx.finish();
-            tx.close();
-          }
+        if (withYear) {
+          showHits(marriageRepository.findByYear(yearValue));
+          return;
         }
+        showHits(Lists.<Marriage> newArrayList());
       }
     });
     search.setClickShortcut(KeyCode.ENTER);

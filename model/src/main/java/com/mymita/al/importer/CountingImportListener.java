@@ -14,12 +14,16 @@ public class CountingImportListener<T> implements ImportListener<T> {
     return count.get(object.getClass());
   }
 
+  @Override
+  public void finishedImport() {
+  }
+
   final protected int max(final T object) {
     return max.get(object.getClass());
   }
 
   @Override
-  public void onImport(final T object) {
+  public void progressImport(final T object) {
     count.put(object.getClass(), 1 + Objects.firstNonNull(count.get(object.getClass()), 0));
   }
 

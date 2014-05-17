@@ -1,14 +1,15 @@
 package com.mymita.al.domain;
 
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.NodeEntity;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-@NodeEntity
-@TypeAlias("Christening")
+@Entity
 public class Christening {
 
-  @GraphId
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;
   private String personCode1;
   private String personCode2;

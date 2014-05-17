@@ -1,22 +1,17 @@
 package com.mymita.al.ui.search.christening;
 
 import java.util.List;
-import java.util.Map;
 
-import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.neo4j.support.Neo4jTemplate;
-import org.springframework.data.neo4j.support.conversion.EntityResultConverter;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.mymita.al.domain.Christening;
+import com.mymita.al.repository.ChristeningRepository;
 import com.mymita.al.ui.search.AbstractSearch;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -50,7 +45,7 @@ public class Search extends AbstractSearch<Christening> {
   private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
   @Autowired
-  transient Neo4jTemplate template;
+  transient ChristeningRepository christeningRepository;
 
   public Search() {
     super(Christening.class, new ClassPathResource("search.html", Search.class));
@@ -75,34 +70,22 @@ public class Search extends AbstractSearch<Christening> {
       @Override
       public void buttonClick(final ClickEvent event) {
         final String nameValue = name(name.getValue());
-        final Integer yearValue = number(year.getValue());
-        final List<String> filter = Lists.newArrayList();
-        final Map<String, Object> params = Maps.newHashMap();
-        if (!Strings.isNullOrEmpty(nameValue)) {
-          filter.add(String.format("(christening.lastNameFather =~ '(?i)%1$s')", nameValue));
+        final String yearValue = String.valueOf(number(year.getValue()));
+        final boolean withName = !Strings.isNullOrEmpty(nameValue);
+        final boolean withYear = !Strings.isNullOrEmpty(yearValue);
+        if (withName && withYear) {
+          showHits(christeningRepository.findByLastNameFatherContainingIgnoreCaseAndYear(nameValue, yearValue));
+          return;
         }
-        if (yearValue != null) {
-          filter.add(String.format("(christening.year = {year})", yearValue));
-          params.put("year", yearValue.toString());
+        if (withName) {
+          showHits(christeningRepository.findByLastNameFatherContainingIgnoreCase(nameValue));
+          return;
         }
-        if (filter.isEmpty()) {
-          showHits(Lists.<Christening> newArrayList());
-        } else {
-          final String cypherQuery = "START christening=node(*) WHERE " + Joiner.on(" AND ").join(filter) + " RETURN christening";
-          LOGGER.debug(cypherQuery);
-          final Transaction tx = template.getGraphDatabase().beginTx();
-          try {
-            showHits(Lists.newArrayList(template
-                .getGraphDatabase()
-                .queryEngine()
-                .query(cypherQuery, params)
-                .to(Christening.class,
-                    new EntityResultConverter<Map<String, Object>, Christening>(template.getConversionService(), template)).iterator()));
-          } finally {
-            tx.finish();
-            tx.close();
-          }
+        if (withYear) {
+          showHits(christeningRepository.findByYear(yearValue));
+          return;
         }
+        showHits(Lists.<Christening> newArrayList());
       }
     });
     search.setClickShortcut(KeyCode.ENTER);
