@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Person.Gender;
 import com.mymita.al.repository.PersonRepository;
@@ -134,8 +134,8 @@ public class Search extends AbstractSearch<Person> {
         final boolean withName = !Strings.isNullOrEmpty(nameValue);
         final boolean withYear = !Strings.isNullOrEmpty(yearOfBirthValue) || !Strings.isNullOrEmpty(yearOfDeathValue);
         if (withName && withYear) {
-          showHits(personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath(nameValue,
-              nameValue, yearOfBirthValue, yearOfDeathValue));
+          showHits(personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath(
+              nameValue, nameValue, yearOfBirthValue, yearOfDeathValue));
           return;
         }
         if (withName) {
@@ -180,7 +180,7 @@ public class Search extends AbstractSearch<Person> {
     resultTable.setColumnAlignment("yearOfDeath", Align.CENTER);
     resultTable.setColumnAlignment("gender", Align.CENTER);
     resultTable.setVisibleColumns(new Object[] { "lastName", "birthName", "firstName", "gender", "yearOfBirth", "yearOfDeath",
-    "yearsOfLife" });
+        "yearsOfLife" });
     resultTable.setItemDescriptionGenerator(new ItemDescriptionGenerator() {
 
       @Override

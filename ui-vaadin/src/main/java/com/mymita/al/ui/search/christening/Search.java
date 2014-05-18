@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.gwt.thirdparty.guava.common.base.Strings;
 import com.mymita.al.domain.Christening;
 import com.mymita.al.repository.ChristeningRepository;
 import com.mymita.al.ui.search.AbstractSearch;
