@@ -7,13 +7,8 @@ import static org.testng.Assert.assertNull;
 
 import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.orm.jpa.EntityScan;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.springframework.test.context.transaction.BeforeTransaction;
 import org.testng.annotations.Test;
@@ -22,16 +17,8 @@ import com.google.common.collect.Iterables;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Person.Gender;
 
-@SpringApplicationConfiguration(classes = PersonRepositoryTest.TestConfig.class)
+@ContextConfiguration(locations = { "classpath:/META-INF/spring/context-test.xml" })
 public class PersonRepositoryTest extends AbstractTransactionalTestNGSpringContextTests {
-
-  @Configuration
-  @EnableAutoConfiguration
-  @ComponentScan
-  @EnableJpaRepositories(basePackages = { "com.mymita.al.repository" })
-  @EntityScan(basePackages = { "com.mymita.al.domain" })
-  static class TestConfig {
-  }
 
   @Autowired
   transient PersonRepository personRepository;
@@ -60,10 +47,10 @@ public class PersonRepositoryTest extends AbstractTransactionalTestNGSpringConte
             "").size(), is(1));
     assertThat(
         personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("öhm", "", "", "")
-            .size(), is(1));
+        .size(), is(1));
     assertThat(
         personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("höh", "", "", "")
-            .size(), is(1));
+        .size(), is(1));
     assertThat(
         personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("höhmann", "",
             "1976", "").size(), is(1));
@@ -72,10 +59,10 @@ public class PersonRepositoryTest extends AbstractTransactionalTestNGSpringConte
             "").size(), is(1));
     assertThat(
         personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("", "öhm", "", "")
-            .size(), is(1));
+        .size(), is(1));
     assertThat(
         personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("", "höh", "", "")
-            .size(), is(1));
+        .size(), is(1));
     assertThat(
         personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath("", "höhmann",
             "1976", "").size(), is(1));

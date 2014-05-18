@@ -5,11 +5,11 @@
   <artifactId>parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.0.2.RELEASE</version>
-  </parent>
+  <!-- <parent> -->
+  <!-- <groupId>org.springframework.boot</groupId> -->
+  <!-- <artifactId>spring-boot-starter-parent</artifactId> -->
+  <!-- <version>1.0.2.RELEASE</version> -->
+  <!-- </parent> -->
   <repositories>
     <repository>
       <id>vaadin-addons</id>
@@ -30,6 +30,7 @@
   </pluginRepositories>
   <properties>
     <spring.version>4.0.4.RELEASE</spring.version>
+    <spring-data-jpa.version>1.5.2.RELEASE</spring-data-jpa.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <compiler.source.version>1.7</compiler.source.version>
     <compiler.target.version>1.7</compiler.target.version>
@@ -41,9 +42,58 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>${spring.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-jpa</artifactId>
+        <version>${spring-data-jpa.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-aspects</artifactId>
+        <version>${spring.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.3</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
