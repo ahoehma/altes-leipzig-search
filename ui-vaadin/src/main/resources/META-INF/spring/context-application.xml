@@ -15,7 +15,7 @@
   <context:component-scan base-package="com.mymita.al" />
   <jdbc:embedded-database id="dataSource" type="HSQL" />
   <jpa:repositories base-package="com.mymita.al" query-lookup-strategy="create-if-not-found" />
-  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+  <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="dataSource" />
     <property name="packagesToScan" value="com.mymita.al.domain" />
     <property name="jpaVendorAdapter">
@@ -26,7 +26,7 @@
     </property>
   </bean>
   <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <property name="entityManagerFactory" ref="emf" />
   </bean>
   <tx:annotation-driven mode="proxy" transaction-manager="transactionManager" />
 </beans>
