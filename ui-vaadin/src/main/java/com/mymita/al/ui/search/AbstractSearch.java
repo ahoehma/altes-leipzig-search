@@ -36,7 +36,7 @@ public abstract class AbstractSearch<T> extends UI {
     if (!Strings.isNullOrEmpty(value)) {
       try {
         return Integer.valueOf(value);
-      } catch (final NumberFormatException e) {
+      } catch (final NumberFormatException ignore) {
       }
     }
     return null;

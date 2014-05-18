@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Person.Gender;
-import com.mymita.al.repository.PersonRepository;
+import com.mymita.al.service.PersonService;
 import com.mymita.al.ui.search.AbstractSearch;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -50,7 +50,7 @@ public class Search extends AbstractSearch<Person> {
   private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
   @Autowired
-  transient PersonRepository personRepository;
+  transient PersonService personService;
 
   public Search() {
     super(Person.class, new ClassPathResource("search.html", Search.class));
@@ -129,24 +129,9 @@ public class Search extends AbstractSearch<Person> {
       @Override
       public void buttonClick(final ClickEvent event) {
         final String nameValue = name(name.getValue());
-        final String yearOfBirthValue = String.valueOf(number(yearOfBirth.getValue()));
-        final String yearOfDeathValue = String.valueOf(number(yearOfDeath.getValue()));
-        final boolean withName = !Strings.isNullOrEmpty(nameValue);
-        final boolean withYear = !Strings.isNullOrEmpty(yearOfBirthValue) || !Strings.isNullOrEmpty(yearOfDeathValue);
-        if (withName && withYear) {
-          showHits(personRepository.findByLastNameContainingIgnoreCaseOrBirthNameContainingIgnoreCaseAndYearOfBirthAndYearOfDeath(
-              nameValue, nameValue, yearOfBirthValue, yearOfDeathValue));
-          return;
-        }
-        if (withName) {
-          showHits(personRepository.findByLastNameContainingAndBirthNameContainingAllIgnoringCase(nameValue, nameValue));
-          return;
-        }
-        if (withYear) {
-          showHits(personRepository.findByYearOfBirthOrYearOfDeath(yearOfBirthValue, yearOfDeathValue));
-          return;
-        }
-        showHits(Lists.<Person> newArrayList());
+        final String yearOfBirthValue = String.valueOf(Objects.firstNonNull(number(yearOfBirth.getValue()), ""));
+        final String yearOfDeathValue = String.valueOf(Objects.firstNonNull(number(yearOfDeath.getValue()), ""));
+        showHits(ImmutableList.copyOf(personService.find(nameValue, yearOfBirthValue, yearOfDeathValue)));
       }
     });
     search.setClickShortcut(KeyCode.ENTER);
@@ -180,7 +165,7 @@ public class Search extends AbstractSearch<Person> {
     resultTable.setColumnAlignment("yearOfDeath", Align.CENTER);
     resultTable.setColumnAlignment("gender", Align.CENTER);
     resultTable.setVisibleColumns(new Object[] { "lastName", "birthName", "firstName", "gender", "yearOfBirth", "yearOfDeath",
-        "yearsOfLife" });
+    "yearsOfLife" });
     resultTable.setItemDescriptionGenerator(new ItemDescriptionGenerator() {
 
       @Override
