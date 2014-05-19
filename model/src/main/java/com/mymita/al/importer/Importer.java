@@ -1,5 +1,6 @@
 package com.mymita.al.importer;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -19,16 +20,16 @@ public class Importer {
     final ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:application-context.xml");
     try {
       final Importer importer = new Importer();
-      // importer.importPersons(ctx);
+      importer.importPersons(ctx);
       importer.importMarriages(ctx);
-      // importer.importChristenings(ctx);
+      importer.importChristenings(ctx);
     } finally {
       ctx.close();
     }
   }
 
   private void importChristenings(final ClassPathXmlApplicationContext ctx) throws BeansException, IOException {
-    ctx.getBean(ChristeningImportService.class).importChristenings("C:/Users/Andreas Höhmann/Dropbox/Datenbank/02 Taufe Abfrage.txt",
+    ctx.getBean(ChristeningImportService.class).importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/02 Taufe Abfrage.txt"),
         new CountingImportListener<Christening>() {
 
           @Override
@@ -40,7 +41,7 @@ public class Importer {
   }
 
   private void importMarriages(final ClassPathXmlApplicationContext ctx) throws BeansException, IOException {
-    ctx.getBean(MarriageImportService.class).importMarriages("C:/Users/Andreas Höhmann/Dropbox/Datenbank/01 Heirat Abfrage.txt",
+    ctx.getBean(MarriageImportService.class).importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/01 Heirat Abfrage.txt"),
         new CountingImportListener<Marriage>() {
 
           @Override
@@ -52,7 +53,7 @@ public class Importer {
   }
 
   private void importPersons(final ClassPathXmlApplicationContext ctx) throws BeansException, IOException {
-    ctx.getBean(PersonImportService.class).importPersons("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt",
+    ctx.getBean(PersonImportService.class).importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt"),
         new CountingImportListener<Person>() {
 
           @Override

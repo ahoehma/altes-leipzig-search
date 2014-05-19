@@ -12,7 +12,15 @@
     <querydsl.version>3.3.3</querydsl.version>
     <hibernate-entitymanager.version>4.3.5.Final</hibernate-entitymanager.version>
   </properties>
+  <repositories>
+    <repository>
+      <id>querydsl</id>
+      <name>QueryDsl</name>
+      <url>http://source.mysema.com/maven2/releases</url>
+    </repository>
+  </repositories>
   <dependencies>
+    <!-- jpa -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
@@ -30,6 +38,18 @@
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-jpa</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-jpa</artifactId>
+      <version>${querydsl.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>cglib</artifactId>
+          <groupId>cglib</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- tools -->
     <dependency>
       <groupId>com.googlecode.jcsv</groupId>
       <artifactId>jcsv</artifactId>
@@ -105,56 +125,30 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <groupId>com.mysema.maven</groupId>
+        <artifactId>apt-maven-plugin</artifactId>
+        <version>1.1.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>process</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-sources/queries</outputDirectory>
+              <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <id>querydsl</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>com.mysema.querydsl</groupId>
-          <artifactId>querydsl-jpa</artifactId>
-          <version>${querydsl.version}</version>
-        </dependency>
-      </dependencies>
-      <repositories>
-        <repository>
-          <id>querydsl</id>
-          <name>QueryDsl</name>
-          <url>http://source.mysema.com/maven2/releases</url>
-        </repository>
-      </repositories>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.mysema.maven</groupId>
-            <artifactId>apt-maven-plugin</artifactId>
-            <version>1.1.1</version>
-            <dependencies>
-              <dependency>
-                <groupId>com.mysema.querydsl</groupId>
-                <artifactId>querydsl-apt</artifactId>
-                <version>${querydsl.version}</version>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>process</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${project.build.directory}/generated-sources/queries</outputDirectory>
-                  <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

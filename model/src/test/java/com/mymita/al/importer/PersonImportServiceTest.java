@@ -2,6 +2,8 @@ package com.mymita.al.importer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.io.File;
+
 import org.hamcrest.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +22,13 @@ public class PersonImportServiceTest extends AbstractTransactionalTestNGSpringCo
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonImportServiceTest.class);
 
   @Autowired
-  transient PersonImportService personImportService;
+  transient ImportService<Person> personImportService;
   @Autowired
   transient PersonRepository personRepository;
 
   @Test
   public void importCsv() throws Exception {
-    personImportService.importPersons("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt",
+    personImportService.importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt"),
         new CountingImportListener<Person>() {
 
       @Override

@@ -1,9 +1,6 @@
 package com.mymita.al.repository;
 
-import static com.mymita.al.repository.PersonRepository.Predicates.hasBirthName;
-import static com.mymita.al.repository.PersonRepository.Predicates.hasBirthYear;
-import static com.mymita.al.repository.PersonRepository.Predicates.hasDeathYear;
-import static com.mymita.al.repository.PersonRepository.Predicates.hasLastName;
+import static com.mymita.al.domain.QPerson.person;
 import static com.mysema.query.types.expr.BooleanExpression.anyOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -28,51 +25,54 @@ public class PersonRepositoryTest extends AbstractTransactionalTestNGSpringConte
 
   @Test
   public void findByLastName() throws Exception {
-    assertThat(personRepository.findAll(hasLastName("Höhmann")), Matchers.<Person> iterableWithSize(1));
+    assertThat(personRepository.findAll(person.lastName.containsIgnoreCase("Höhmann")), Matchers.<Person> iterableWithSize(1));
   }
 
   @Test
   public void findByLastNameOrBirthNameAndYearOfBirthAndYearOfDeathNeg() throws Exception {
-    assertThat(
-        personRepository.findAll(anyOf(hasLastName("Einstein"), hasBirthName("Einstein")).and(hasBirthYear("1879")).and(
-            hasDeathYear("1900"))), Matchers.<Person> iterableWithSize(0));
+    assertThat(personRepository.findAll(anyOf(person.lastName.containsIgnoreCase("Einstein"),
+        person.birthName.containsIgnoreCase("Einstein")).and(person.yearOfBirth.eq("1879")).and(person.yearOfDeath.eq("1900"))),
+        Matchers.<Person> iterableWithSize(0));
   }
 
   @Test
   public void findByLastNameOrBirthNameAndYearOfBirthAndYearOfDeathPos() throws Exception {
-    assertThat(
-        personRepository.findAll(anyOf(hasLastName("Einstein"), hasBirthName("Einstein")).and(hasBirthYear("1879")).and(
-            hasDeathYear("1955"))), Matchers.<Person> iterableWithSize(1));
+    assertThat(personRepository.findAll(anyOf(person.lastName.containsIgnoreCase("Einstein"),
+        person.birthName.containsIgnoreCase("Einstein")).and(person.yearOfBirth.eq("1879")).and(person.yearOfDeath.eq("1955"))),
+        Matchers.<Person> iterableWithSize(1));
   }
 
   @Test
   public void findByLastNameOrBirthNameAndYearOfBirthNeg() throws Exception {
-    assertThat(personRepository.findAll(anyOf(hasLastName("Höhmann"), hasBirthName("höhmann")).and(hasBirthYear("1900"))),
-        Matchers.<Person> iterableWithSize(0));
+    assertThat(
+        personRepository.findAll(anyOf(person.lastName.containsIgnoreCase("Höhmann"), person.birthName.containsIgnoreCase("Höhmann")).and(
+            person.yearOfBirth.eq("1900"))), Matchers.<Person> iterableWithSize(0));
   }
 
   @Test
   public void findByLastNameOrBirthNameAndYearOfBirthPos() throws Exception {
-    assertThat(personRepository.findAll(anyOf(hasLastName("Höhmann"), hasBirthName("höhmann")).and(hasBirthYear("1976"))),
-        Matchers.<Person> iterableWithSize(1));
+    assertThat(
+        personRepository.findAll(anyOf(person.lastName.containsIgnoreCase("Höhmann"), person.birthName.containsIgnoreCase("Höhmann")).and(
+            person.yearOfBirth.eq("1976"))), Matchers.<Person> iterableWithSize(1));
   }
 
   @Test
   public void findByLastNameOrBirthNameAndYearOfDeathNeg() throws Exception {
-    assertThat(personRepository.findAll(anyOf(hasLastName("Höhmann"), hasBirthName("höhmann")).and(hasDeathYear("1900"))),
-        Matchers.<Person> iterableWithSize(0));
+    assertThat(
+        personRepository.findAll(anyOf(person.lastName.containsIgnoreCase("Höhmann"), person.birthName.containsIgnoreCase("Höhmann")).and(
+            person.yearOfDeath.eq("1900"))), Matchers.<Person> iterableWithSize(0));
   }
 
   @Test
   public void findByLastNameOrBirthNameAndYearOfDeathPos() throws Exception {
-    assertThat(personRepository.findAll(anyOf(hasLastName("Einstein"), hasBirthName("Einstein")).and(hasDeathYear("1955"))),
-        Matchers.<Person> iterableWithSize(1));
+    assertThat(personRepository.findAll(anyOf(person.lastName.containsIgnoreCase("Einstein"),
+        person.birthName.containsIgnoreCase("Einstein")).and(person.yearOfDeath.eq("1955"))), Matchers.<Person> iterableWithSize(1));
   }
 
   @Test
   public void findByYearOfBirth() throws Exception {
-    assertThat(personRepository.findAll(hasBirthYear("1976")), Matchers.<Person> iterableWithSize(1));
-    assertThat(personRepository.findAll(hasBirthYear("1900")), Matchers.<Person> iterableWithSize(0));
+    assertThat(personRepository.findAll(anyOf(person.yearOfBirth.eq("1976"))), Matchers.<Person> iterableWithSize(1));
+    assertThat(personRepository.findAll(anyOf(person.yearOfBirth.eq("1955"))), Matchers.<Person> iterableWithSize(0));
   }
 
   @BeforeTransaction

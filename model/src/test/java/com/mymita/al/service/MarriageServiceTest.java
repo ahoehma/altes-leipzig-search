@@ -1,7 +1,5 @@
-package com.mymita.al.repository;
+package com.mymita.al.service;
 
-import static com.mymita.al.domain.QMarriage.marriage;
-import static com.mysema.query.types.expr.BooleanExpression.anyOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -14,25 +12,26 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 import com.mymita.al.domain.Marriage;
+import com.mymita.al.repository.MarriageRepository;
 
 @ContextConfiguration(locations = { "classpath:/META-INF/spring/context-test.xml" })
-public class MarriageRepositoryTest extends AbstractTransactionalTestNGSpringContextTests {
+public class MarriageServiceTest extends AbstractTransactionalTestNGSpringContextTests {
 
+  @Autowired
+  transient MarriageService marriageService;
   @Autowired
   transient MarriageRepository marriageRepository;
 
   @Test
-  public void findByLastNameOrBirthNameAndYearOfDeathNeg() throws Exception {
-    assertThat(
-        marriageRepository.findAll(anyOf(marriage.lastNamePerson1.containsIgnoreCase("höh"),
-            marriage.birthNamePerson2.containsIgnoreCase("")).and(marriage.year.eq("1900"))), Matchers.<Marriage> iterableWithSize(0));
+  public void findByLastNamePerson1OrBirthNamePerson2AndYearNeg() throws Exception {
+    assertThat(marriageService.find("Höhmann", "1900"), Matchers.<Marriage> iterableWithSize(0));
+    assertThat(marriageService.find("Krug", "1900"), Matchers.<Marriage> iterableWithSize(0));
   }
 
   @Test
-  public void findByLastNameOrBirthNameAndYearOfDeathPos() throws Exception {
-    assertThat(
-        marriageRepository.findAll(anyOf(marriage.lastNamePerson1.containsIgnoreCase("höh"),
-            marriage.birthNamePerson2.containsIgnoreCase("")).and(marriage.year.eq("2010"))), Matchers.<Marriage> iterableWithSize(1));
+  public void findByLastNamePerson1OrBirthNamePerson2AndYearPos() throws Exception {
+    assertThat(marriageService.find("Höhmann", "2010"), Matchers.<Marriage> iterableWithSize(1));
+    assertThat(marriageService.find("Krug", "2010"), Matchers.<Marriage> iterableWithSize(1));
   }
 
   @BeforeTransaction
@@ -44,5 +43,4 @@ public class MarriageRepositoryTest extends AbstractTransactionalTestNGSpringCon
     assertThat(marriageRepository.count(), Matchers.is(1L));
     assertThat(Iterables.getFirst(marriageRepository.findAll(), null).getLastNamePerson1(), is("Höhmann"));
   }
-
 }

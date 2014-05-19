@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -50,16 +51,13 @@ public class ChristeningImportService implements ImportService<Christening> {
       final String quelle = data[9];
       importChristening(
           new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode).personCode2(kPersCode)
-          .personCode2(mPersCode).reference(quelle).profession(taetigkeit).reference(quelle).firstNameFather(vaterVName)
-          .lastNameFather(vaterName), importListener);
+              .personCode2(mPersCode).reference(quelle).profession(taetigkeit).reference(quelle).firstNameFather(vaterVName)
+              .lastNameFather(vaterName), importListener);
     }
   }
 
-  public void importChristenings(final String csv, final ImportListener<Christening> importListener) throws IOException {
-    importData(new File(csv), importListener);
-  }
-
   @Override
+  @Transactional
   public void importData(final File file, final ImportListener<Christening> importListener) {
     final List<String[]> christenings = readChristenings(file, importListener);
     if (christenings == null) {

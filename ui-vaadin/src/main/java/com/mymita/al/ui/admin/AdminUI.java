@@ -14,14 +14,12 @@ import com.google.common.io.Files;
 import com.mymita.al.domain.Christening;
 import com.mymita.al.domain.Marriage;
 import com.mymita.al.domain.Person;
-import com.mymita.al.importer.ChristeningImportService;
 import com.mymita.al.importer.CountingImportListener;
 import com.mymita.al.importer.ImportService;
-import com.mymita.al.importer.MarriageImportService;
-import com.mymita.al.importer.PersonImportService;
 import com.mymita.al.repository.ChristeningRepository;
 import com.mymita.al.repository.MarriageRepository;
 import com.mymita.al.repository.PersonRepository;
+import com.mymita.al.ui.admin.AdminUI.ImportWorker.Callback;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.util.BeanItemContainer;
@@ -92,10 +90,16 @@ public class AdminUI extends UI {
 
   static class ImportWorker<T> extends Thread {
 
+    interface Callback {
+      void finishedImport();
+    }
+
     private final ImportService<T> importer;
 
     private File file;
     private ProgressBar progressBar;
+
+    private Callback callback;
 
     public ImportWorker(final ImportService<T> importer) {
       this.importer = importer;
@@ -106,11 +110,17 @@ public class AdminUI extends UI {
       importer.importData(file, new CountingImportListener<T>() {
 
         @Override
+        public void finishedImport() {
+          super.finishedImport();
+          callback.finishedImport();
+        }
+
+        @Override
         public void progressImport(final T object) {
           super.progressImport(object);
           final int numberOfImportedPersons = count(object);
           if (numberOfImportedPersons > 0) {
-            UI.getCurrent().accessSynchronously(new Runnable() {
+            UI.getCurrent().access(new Runnable() {
 
               @Override
               public void run() {
@@ -133,9 +143,10 @@ public class AdminUI extends UI {
      * @param progressBar
      *          to show the progress of the import
      */
-    public void start(final File csvFile, final ProgressBar progressBar) {
+    public void start(final File csvFile, final ProgressBar progressBar, final Callback callback) {
       this.file = csvFile;
       this.progressBar = progressBar;
+      this.callback = callback;
       start();
     }
   }
@@ -150,12 +161,17 @@ public class AdminUI extends UI {
   @Autowired
   transient ChristeningRepository christeningRepository;
   @Autowired
-  transient PersonImportService personImportService;
+  transient ImportService<Person> personImportService;
   @Autowired
-  transient MarriageImportService marriageImportService;
+  transient ImportService<Marriage> marriageImportService;
   @Autowired
-  transient ChristeningImportService christeningImportService;
+  transient ImportService<Christening> christeningImportService;
 
+  private final BeanItemContainer<Person> personContainer = new BeanItemContainer<Person>(Person.class);
+  private final BeanItemContainer<Marriage> marriageContainer = new BeanItemContainer<Marriage>(Marriage.class);
+  private final BeanItemContainer<Christening> christeningContainer = new BeanItemContainer<Christening>(Christening.class);
+
+  @SuppressWarnings("serial")
   private void addChristeningDeleteAll(final VerticalLayout result) {
     result.addComponent(new NativeButton("Delete all christenings", new Button.ClickListener() {
 
@@ -167,22 +183,41 @@ public class AdminUI extends UI {
   }
 
   private void addChristeningImport(final VerticalLayout result) {
-    addImporter(result, "Start christening import", christeningImportService);
+    addImporter(result, "Start christening import", christeningImportService, new Callback() {
+
+      @Override
+      public void finishedImport() {
+        christeningContainer.removeAllItems();
+        christeningContainer.addAll(ImmutableList.copyOf(christeningRepository.findAll()));
+      }
+    });
+  }
+
+  @SuppressWarnings("serial")
+  private void addChristeningRefresh(final VerticalLayout result) {
+    result.addComponent(new NativeButton("Refresh all christenings", new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(final Button.ClickEvent event) {
+        christeningContainer.removeAllItems();
+        christeningContainer.addAll(ImmutableList.copyOf(christeningRepository.findAll()));
+      }
+    }));
   }
 
   private void addChristeningTable(final VerticalLayout result) {
-    result.addComponent(new Table(null, new BeanItemContainer<Christening>(Christening.class, ImmutableList.copyOf(christeningRepository
-        .findAll()))));
+    result.addComponent(new Table(null, christeningContainer));
   }
 
-  private <T> void addImporter(final VerticalLayout result, final String caption, final ImportService<T> importService) {
+  private <T> void addImporter(final VerticalLayout result, final String caption, final ImportService<T> importService,
+      final Callback callback) {
     final ProgressBar progressBar = new ProgressBar();
     progressBar.setVisible(false);
     final CsvUploader<T> receiver = new CsvUploader<T>(progressBar, new Importer<T>() {
 
       @Override
       public void importData(final File file, final ProgressBar progressBar) {
-        new ImportWorker<T>(importService).start(file, progressBar);
+        new ImportWorker<T>(importService).start(file, progressBar, callback);
       }
     });
     final Upload upload = new Upload(null, receiver);
@@ -195,6 +230,7 @@ public class AdminUI extends UI {
     result.addComponent(c);
   }
 
+  @SuppressWarnings("serial")
   private void addMarriageDeleteAll(final VerticalLayout result) {
     result.addComponent(new NativeButton("Delete all marriages", new Button.ClickListener() {
 
@@ -206,30 +242,70 @@ public class AdminUI extends UI {
   }
 
   private void addMarriageImport(final VerticalLayout result) {
-    addImporter(result, "Start marriage import", marriageImportService);
+    addImporter(result, "Start marriage import", marriageImportService, new Callback() {
+
+      @Override
+      public void finishedImport() {
+        marriageContainer.removeAllItems();
+        marriageContainer.addAll(ImmutableList.copyOf(marriageRepository.findAll()));
+      }
+    });
+  }
+
+  @SuppressWarnings("serial")
+  private void addMarriageRefresh(final VerticalLayout result) {
+    result.addComponent(new NativeButton("Refresh all marriages", new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(final Button.ClickEvent event) {
+        marriageContainer.removeAllItems();
+        marriageContainer.addAll(ImmutableList.copyOf(marriageRepository.findAll()));
+      }
+    }));
   }
 
   private void addMarriageTable(final VerticalLayout result) {
-    result
-    .addComponent(new Table(null, new BeanItemContainer<Marriage>(Marriage.class, ImmutableList.copyOf(marriageRepository.findAll()))));
+    result.addComponent(new Table(null, marriageContainer));
   }
 
+  @SuppressWarnings("serial")
   private void addPersonDeleteAll(final VerticalLayout result) {
     result.addComponent(new NativeButton("Delete all persons", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
         personRepository.deleteAll();
+        personContainer.removeAllItems();
+        personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
       }
     }));
   }
 
   private void addPersonImport(final VerticalLayout result) {
-    addImporter(result, "Start person import", personImportService);
+    addImporter(result, "Start person import", personImportService, new Callback() {
+
+      @Override
+      public void finishedImport() {
+        personContainer.removeAllItems();
+        personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
+      }
+    });
+  }
+
+  @SuppressWarnings("serial")
+  private void addPersonRefresh(final VerticalLayout result) {
+    result.addComponent(new NativeButton("Refresh all persons", new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(final Button.ClickEvent event) {
+        personContainer.removeAllItems();
+        personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
+      }
+    }));
   }
 
   private void addPersonTable(final VerticalLayout result) {
-    result.addComponent(new Table(null, new BeanItemContainer<Person>(Person.class, ImmutableList.copyOf(personRepository.findAll()))));
+    result.addComponent(new Table(null, personContainer));
   }
 
   private Component createChristeningTab() {
@@ -237,6 +313,7 @@ public class AdminUI extends UI {
     addChristeningTable(result);
     addChristeningImport(result);
     addChristeningDeleteAll(result);
+    addChristeningRefresh(result);
     return result;
   }
 
@@ -253,6 +330,7 @@ public class AdminUI extends UI {
     addMarriageTable(result);
     addMarriageImport(result);
     addMarriageDeleteAll(result);
+    addMarriageRefresh(result);
     return result;
   }
 
@@ -261,6 +339,7 @@ public class AdminUI extends UI {
     addPersonTable(result);
     addPersonImport(result);
     addPersonDeleteAll(result);
+    addPersonRefresh(result);
     return result;
   }
 

@@ -9,6 +9,7 @@
 
 	<logger name="org.springframework" level="WARN" />
   <logger name="com.mymita.al" level="DEBUG" />
+  <logger name="com.mysema.query.jpa" level="DEBUG" />
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

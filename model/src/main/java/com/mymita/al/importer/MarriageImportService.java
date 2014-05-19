@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -30,6 +31,7 @@ public class MarriageImportService implements ImportService<Marriage> {
   transient MarriageRepository marriageRepository;
 
   @Override
+  @Transactional
   public void importData(final File file, final ImportListener<Marriage> importListener) {
     final List<String[]> marriages = readMarriages(file, importListener);
     if (marriages == null) {
@@ -74,10 +76,6 @@ public class MarriageImportService implements ImportService<Marriage> {
           .firstNamePerson2(fVorname);
       importMarriage(newMarriage, importListener);
     }
-  }
-
-  public void importMarriages(final String csv, final ImportListener<Marriage> importListener) throws IOException {
-    importData(new File(csv), importListener);
   }
 
   @Nullable

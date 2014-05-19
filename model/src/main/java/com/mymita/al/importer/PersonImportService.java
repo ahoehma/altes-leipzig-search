@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -44,6 +45,7 @@ public class PersonImportService implements ImportService<Person> {
   }
 
   @Override
+  @Transactional
   public void importData(final File file, final ImportListener<Person> importListener) {
     final List<String[]> persons = readPersons(file, importListener);
     if (persons == null) {
