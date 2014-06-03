@@ -105,31 +105,17 @@ public class Search extends AbstractSearch<Christening> {
     descriptionPanel.addStyleName(Reindeer.PANEL_LIGHT);
     descriptionPanel.setCaption("Beschreibung");
     descriptionPanel.setHeight(130, Unit.PIXELS);
-    descriptionPanel.setWidth(450, Unit.PIXELS);
+    descriptionPanel.setWidth(100, Unit.PERCENTAGE);
     final VerticalLayout infoPanelLayout = new VerticalLayout();
-    infoPanelLayout.addComponent(new Label("Code: " + (result != null ? result.getFamilyCode() : "")));
-    // infoPanelLayout.addComponent(new Label(result != null ? result.getDescription() : ""));
+    infoPanelLayout.addComponent(new VerticalLayout(new Label("Code: " + (result != null ? result.getFamilyCode() : "")), new Label(
+        "Beruf: " + (result != null ? result.getProfession() : ""))));
     descriptionPanel.setContent(infoPanelLayout);
-
-    final Panel imagePanel = new Panel();
-    imagePanel.setStyleName(Reindeer.PANEL_LIGHT);
-    imagePanel.setCaption("Bild/Vorschau");
-    imagePanel.setHeight(100, Unit.PERCENTAGE);
-    imagePanel.setWidth(220, Unit.PIXELS);
-    final VerticalLayout imagePanelLayout = new VerticalLayout();
-    imagePanelLayout.setStyleName("image-panel");
-    imagePanelLayout.setSizeFull();
-    final Label human = new Label("<i class=\"fi-torso image-preview\"/>", ContentMode.HTML);
-    human.setSizeUndefined();
-    imagePanelLayout.addComponent(human);
-    imagePanelLayout.setComponentAlignment(human, Alignment.MIDDLE_CENTER);
-    imagePanel.setContent(imagePanelLayout);
 
     final Panel referencePanel = new Panel();
     referencePanel.setStyleName(Reindeer.PANEL_LIGHT);
     referencePanel.setCaption("Quelle / Ersterwähnung");
     referencePanel.setHeight(40, Unit.PIXELS);
-    referencePanel.setWidth(450, Unit.PIXELS);
+    referencePanel.setWidth(100, Unit.PERCENTAGE);
     final VerticalLayout referencePanelLayout = new VerticalLayout();
     referencePanelLayout.setStyleName("reference-panel");
     referencePanelLayout.setSizeFull();
@@ -142,13 +128,10 @@ public class Search extends AbstractSearch<Christening> {
     infos.setSpacing(true);
     infos.setWidth(100, Unit.PERCENTAGE);
 
-    infos.addComponent(descriptionPanel, 0, 1);
-    infos.addComponent(referencePanel, 0, 2);
-    infos.addComponent(imagePanel, 1, 1, 1, 2);
-    infos.setComponentAlignment(imagePanel, Alignment.MIDDLE_RIGHT);
+    infos.addComponent(descriptionPanel, 0, 1, 1, 1);
+    infos.addComponent(referencePanel, 0, 2, 1, 2);
     infos.setComponentAlignment(descriptionPanel, Alignment.TOP_LEFT);
     infos.setComponentAlignment(referencePanel, Alignment.BOTTOM_LEFT);
-    infos.setRowExpandRatio(0, 0);
 
     content.removeComponent("help");
     final Label icon = new Label("<i class=\"fi-info help\"/>", ContentMode.HTML);
@@ -171,7 +154,7 @@ public class Search extends AbstractSearch<Christening> {
       hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
       content.addComponent(hintLayout, "help");
     } else if (resultTable.size() > 0 && result != null) {
-      final Label hint = new Label("Klicken Sie bitte hier um weitere Informationen zur gewählten Hochzeit zu erfragen");
+      final Label hint = new Label("Klicken Sie bitte hier um weitere Informationen zur gewählten Taufe zu erfragen");
       hint.setStyleName("hint");
       hint.addStyleName("contact");
       new BrowserWindowOpener(new ExternalResource("mailto:wehlmann@altes-leipzig.de?subject=Detailanfrage für FamilienCode '"

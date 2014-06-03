@@ -38,6 +38,7 @@ public class ChristeningImportService implements ImportService<Christening> {
   }
 
   private void importChristenings(final List<String[]> marriages, final ImportListener<Christening> importListener) {
+    // "KPersCode";"Taufkind";"Jahr";"Kirche";"FamCode";"MPersCode";"VaterName";"VaterVName";"Tätigkeit";"Quelle"
     for (final String[] data : marriages) {
       final String kPersCode = data[0];
       final String taufKind = data[1];
@@ -46,13 +47,12 @@ public class ChristeningImportService implements ImportService<Christening> {
       final String famCode = data[4];
       final String mPersCode = data[5];
       final String vaterName = data[6];
-      final String vaterVName = data[8];
-      final String taetigkeit = data[9];
+      final String vaterVName = data[7];
+      final String taetigkeit = data[8];
       final String quelle = data[9];
-      importChristening(
-          new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode).personCode2(kPersCode)
-              .personCode2(mPersCode).reference(quelle).profession(taetigkeit).reference(quelle).firstNameFather(vaterVName)
-              .lastNameFather(vaterName), importListener);
+      importChristening(new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode)
+          .personCode2(kPersCode).personCode2(mPersCode).reference(quelle).profession(taetigkeit).firstNameFather(vaterVName)
+          .lastNameFather(vaterName), importListener);
     }
   }
 
