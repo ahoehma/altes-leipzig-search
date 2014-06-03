@@ -2,16 +2,14 @@ package com.mymita.al.ui.search.christening;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
+import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableList;
 import com.mymita.al.domain.Christening;
-import com.mymita.al.repository.ChristeningRepository;
+import com.mymita.al.service.ChristeningService;
 import com.mymita.al.ui.search.AbstractSearch;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -42,10 +40,9 @@ import com.vaadin.ui.themes.Reindeer;
 public class Search extends AbstractSearch<Christening> {
 
   private static final long serialVersionUID = -6780876618168616688L;
-  private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
   @Autowired
-  transient ChristeningRepository christeningRepository;
+  transient ChristeningService christeningService;
 
   public Search() {
     super(Christening.class, new ClassPathResource("search.html", Search.class));
@@ -70,22 +67,8 @@ public class Search extends AbstractSearch<Christening> {
       @Override
       public void buttonClick(final ClickEvent event) {
         final String nameValue = name(name.getValue());
-        final String yearValue = String.valueOf(number(year.getValue()));
-        final boolean withName = !Strings.isNullOrEmpty(nameValue);
-        final boolean withYear = !Strings.isNullOrEmpty(yearValue);
-        if (withName && withYear) {
-          showHits(christeningRepository.findByLastNameFatherContainingIgnoreCaseAndYear(nameValue, yearValue));
-          return;
-        }
-        if (withName) {
-          showHits(christeningRepository.findByLastNameFatherContainingIgnoreCase(nameValue));
-          return;
-        }
-        if (withYear) {
-          showHits(christeningRepository.findByYear(yearValue));
-          return;
-        }
-        showHits(Lists.<Christening> newArrayList());
+        final String yearValue = String.valueOf(Objects.firstNonNull(number(year.getValue()), ""));
+        showHits(ImmutableList.copyOf(christeningService.find(nameValue, yearValue)));
       }
     });
     search.setClickShortcut(KeyCode.ENTER);

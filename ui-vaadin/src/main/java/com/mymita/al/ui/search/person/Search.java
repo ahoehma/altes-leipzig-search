@@ -3,8 +3,6 @@ package com.mymita.al.ui.search.person;
 import java.util.List;
 import java.util.Locale;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
@@ -47,7 +45,6 @@ import com.vaadin.ui.themes.Reindeer;
 public class Search extends AbstractSearch<Person> {
 
   private static final long serialVersionUID = -6780876618168616688L;
-  private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
   @Autowired
   transient PersonService personService;
@@ -165,7 +162,7 @@ public class Search extends AbstractSearch<Person> {
     resultTable.setColumnAlignment("yearOfDeath", Align.CENTER);
     resultTable.setColumnAlignment("gender", Align.CENTER);
     resultTable.setVisibleColumns(new Object[] { "lastName", "birthName", "firstName", "gender", "yearOfBirth", "yearOfDeath",
-    "yearsOfLife" });
+        "yearsOfLife" });
     resultTable.setItemDescriptionGenerator(new ItemDescriptionGenerator() {
 
       @Override
