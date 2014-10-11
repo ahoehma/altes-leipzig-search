@@ -20,7 +20,7 @@
     <property name="password" value="" />
   </bean>
   <jpa:repositories base-package="com.mymita.al" query-lookup-strategy="create-if-not-found" />
-  <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
     <property name="dataSource" ref="dataSource" />
     <property name="packagesToScan" value="com.mymita.al.domain" />
     <property name="jpaVendorAdapter">
@@ -31,7 +31,7 @@
     </property>
   </bean>
   <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-    <property name="entityManagerFactory" ref="emf" />
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
   </bean>
   <tx:annotation-driven mode="proxy" transaction-manager="transactionManager" />
 </beans>

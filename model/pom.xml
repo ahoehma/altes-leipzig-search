@@ -9,8 +9,8 @@
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <properties>
-    <querydsl.version>3.3.3</querydsl.version>
-    <hibernate-entitymanager.version>4.3.5.Final</hibernate-entitymanager.version>
+    <querydsl.version>3.5.0</querydsl.version>
+    <hibernate-entitymanager.version>4.3.6.Final</hibernate-entitymanager.version>
   </properties>
   <repositories>
     <repository>
@@ -81,7 +81,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <version>1.0.2.RELEASE</version>
+      <version>1.1.7.RELEASE</version>
       <scope>test</scope>
     </dependency>
     <dependency>

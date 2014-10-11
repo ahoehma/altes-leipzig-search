@@ -10,7 +10,7 @@
   </New>
   <New id="tlsHttpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
     <Arg>
-      <New id="httpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+      <New class="org.eclipse.jetty.server.HttpConfiguration">
         <Set name="secureScheme">https</Set>
         <Set name="securePort">
           <Property name="jetty.secure.port" default="8443" />
