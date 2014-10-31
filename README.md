@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/ahoehma/altes-leipzig-search.svg?branch=master)](https://travis-ci.org/ahoehma/altes-leipzig-search)
 
-altes-leipzig-search
+Altes Leipzig Search
 ====================
 
 Search Webapp for www.altes-leipzig.de
