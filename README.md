@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ahoehma/altes-leipzig-search.png?branch=master)](https://travis-ci.org/ahoehma/altes-leipzig-search)
+
 altes-leipzig-search
 ====================
 
