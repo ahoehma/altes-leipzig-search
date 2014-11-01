@@ -80,9 +80,10 @@ public class PersonImportService implements ImportService<Person> {
       final String description = data[8];
       final String reference = data[9];
       final String link = data[10];
-      importPersonInternal(new Person().personCode(code).lastName(lastName).firstName(firstName).birthName(birthName).gender(gender)
-          .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description).reference(reference),
-          importListener);
+      importPersonInternal(
+          Person.builder().personCode(code).lastName(lastName).firstName(firstName).birthName(birthName).gender(gender)
+              .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description).reference(reference)
+              .build(), importListener);
     }
   }
 

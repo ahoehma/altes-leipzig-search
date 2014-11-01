@@ -2,7 +2,7 @@ package com.mymita.al.importer;
 
 import java.util.Map;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 
 public class CountingImportListener<T> implements ImportListener<T> {
@@ -24,7 +24,7 @@ public class CountingImportListener<T> implements ImportListener<T> {
 
   @Override
   public void progressImport(final T object) {
-    count.put(object.getClass(), 1 + Objects.firstNonNull(count.get(object.getClass()), 0));
+    count.put(object.getClass(), 1 + MoreObjects.firstNonNull(count.get(object.getClass()), 0));
   }
 
   @Override

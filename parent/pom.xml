@@ -35,8 +35,7 @@
     <spring.version>4.1.1.RELEASE</spring.version>
     <spring-data-jpa.version>1.7.0.RELEASE</spring-data-jpa.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <compiler.source.version>1.7</compiler.source.version>
-    <compiler.target.version>1.7</compiler.target.version>
+    <compiler.version>1.6</compiler.version>
     <aspectj.version>1.8.2</aspectj.version>
     <slf4j.version>1.7.7</slf4j.version>
     <logback.version>1.1.2</logback.version>
@@ -44,6 +43,7 @@
     <jodatime.version>2.5</jodatime.version>
     <testng.version>6.8.8</testng.version>
     <hamcrest.version>1.3</hamcrest.version>
+    <lombok.version>1.14.8</lombok.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -173,6 +173,11 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>${testng.version}</version>
@@ -195,26 +200,30 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.2</version>
+          <configuration>
+            <source>${compiler.version}</source>
+            <target>${compiler.version}</target>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <useIncrementalCompilation>false</useIncrementalCompilation>
+          </configuration>
+        </plugin>
+        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>aspectj-maven-plugin</artifactId>
           <version>1.7</version>
           <configuration>
             <outxml>false</outxml>
-            <source>${compiler.source.version}</source>
-            <target>${compiler.target.version}</target>
-            <complianceLevel>${compiler.target.version}</complianceLevel>
+            <source>${compiler.version}</source>
+            <target>${compiler.version}</target>
+            <complianceLevel>${compiler.version}</complianceLevel>
+            <compilerVersion>${compiler.version}</compilerVersion>
             <Xlint>ignore</Xlint>
             <encoding>${project.build.sourceEncoding}</encoding>
-            <verbose>false</verbose>
+            <verbose>true</verbose>
           </configuration>
-          <executions>
-            <execution>
-              <goals>
-                <goal>compile</goal>
-                <goal>test-compile</goal>
-              </goals>
-            </execution>
-          </executions>
           <dependencies>
             <dependency>
               <groupId>org.aspectj</groupId>
@@ -227,20 +236,16 @@
               <version>${aspectj.version}</version>
             </dependency>
           </dependencies>
+          <executions>
+            <execution>
+              <goals>
+                <goal>compile</goal>
+                <goal>test-compile</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>${compiler.source.version}</source>
-          <target>${compiler.target.version}</target>
-          <encoding>${project.build.sourceEncoding}</encoding>
-          <useIncrementalCompilation>true</useIncrementalCompilation>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
 </project>

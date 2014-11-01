@@ -78,10 +78,10 @@ public class PersonRepositoryTest extends AbstractTransactionalTestNGSpringConte
   @BeforeTransaction
   public void setupData() throws Exception {
     deleteFromTables("person");
-    personRepository.save(new Person().firstName("Andreas").lastName("Höhmann").birthName("Höhmann").gender(Gender.MALE).personCode("0001")
-        .yearOfBirth("1976"));
-    personRepository.save(new Person().firstName("Albert").lastName("Einstein").birthName("Einstein").gender(Gender.MALE)
-        .personCode("0002").yearOfBirth("1879").yearOfDeath("1955"));
+    personRepository.save(Person.builder().firstName("Andreas").lastName("Höhmann").birthName("Höhmann").gender(Gender.MALE)
+        .personCode("0001").yearOfBirth("1976").build());
+    personRepository.save(Person.builder().firstName("Albert").lastName("Einstein").birthName("Einstein").gender(Gender.MALE)
+        .personCode("0002").yearOfBirth("1879").yearOfDeath("1955").build());
     assertThat(personRepository.count(), Matchers.is(2L));
     assertThat(Iterables.getFirst(personRepository.findAll(), null).getLastName(), is("Höhmann"));
   }
@@ -89,7 +89,7 @@ public class PersonRepositoryTest extends AbstractTransactionalTestNGSpringConte
   @Test(expectedExceptions = { DataIntegrityViolationException.class }, expectedExceptionsMessageRegExp = ".*constraint \\[UNIQUE_PERSON_CODE\\].*")
   public void unqiuePersonCode() throws Exception {
     // same person code 0001
-    personRepository.save(new Person().firstName("Peter").lastName("Lustig").birthName("Lustig").gender(Gender.MALE).personCode("0001")
-        .yearOfBirth("1912"));
+    personRepository.save(Person.builder().firstName("Peter").lastName("Lustig").birthName("Lustig").gender(Gender.MALE).personCode("0001")
+        .yearOfBirth("1912").build());
   }
 }
