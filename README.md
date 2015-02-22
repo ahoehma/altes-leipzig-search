@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/ahoehma/altes-leipzig-search.svg?branch=master)](https://travis-ci.org/ahoehma/altes-leipzig-search)
+[![Dependency Status](https://www.versioneye.com/user/projects/5494867edd709d811f000591/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5494867edd709d811f000591)
 
 Altes Leipzig Search
 ====================
