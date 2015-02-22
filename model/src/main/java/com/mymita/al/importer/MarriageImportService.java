@@ -45,14 +45,16 @@ public class MarriageImportService implements ImportService<Marriage> {
     LOGGER.debug("Created '{}' marriages", marriages.size());
   }
 
-  private void importMarriage(final Marriage marriage, final ImportListener<Marriage> importListener) {
+  private void importMarriage(final int i, final int max, final Marriage marriage, final ImportListener<Marriage> importListener) {
     marriageRepository.save(marriage);
     if (importListener != null) {
-      importListener.progressImport(marriage);
+      importListener.progressImport(marriage, i, max);
     }
   }
 
   private void importMarriages(final List<String[]> marriages, final ImportListener<Marriage> importListener) {
+    final int max = marriages.size();
+    int i = 1;
     for (final String[] data : marriages) {
       final String persCode1 = data[0];
       final String famName = data[1];
@@ -74,7 +76,8 @@ public class MarriageImportService implements ImportService<Marriage> {
           .church(kirche).reference(quelle).periodMarriage(zeitraum).year(jahr).professionPerson1(persMBeruf).professionPerson2(persWBeruf)
           .cityPerson1(persMOrt).cityPerson2(persWOrt).lastNamePerson1(famName).birthNamePerson2(gebName).firstNamePerson1(mVorname)
           .firstNamePerson2(fVorname);
-      importMarriage(newMarriage, importListener);
+      importMarriage(i, max, newMarriage, importListener);
+      i++;
     }
   }
 
@@ -88,7 +91,7 @@ public class MarriageImportService implements ImportService<Marriage> {
       marriageReader.readHeader();
       final List<String[]> marriages = marriageReader.readAll();
       if (importListener != null) {
-        importListener.startImport(Marriage.class, marriages.size());
+        importListener.startImport(marriages.size());
       }
       return ImmutableList.copyOf(marriages);
     } catch (final IOException e) {

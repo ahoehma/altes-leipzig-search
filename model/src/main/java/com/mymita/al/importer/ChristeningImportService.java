@@ -30,16 +30,18 @@ public class ChristeningImportService implements ImportService<Christening> {
   @Autowired
   transient ChristeningRepository christeningRepository;
 
-  private void importChristening(final Christening christening, final ImportListener<Christening> importListener) {
+  private void importChristening(final int i, final int max, final Christening christening, final ImportListener<Christening> importListener) {
     christeningRepository.save(christening);
     if (importListener != null) {
-      importListener.progressImport(christening);
+      importListener.progressImport(christening, i, max);
     }
   }
 
-  private void importChristenings(final List<String[]> marriages, final ImportListener<Christening> importListener) {
+  private void importChristenings(final List<String[]> christenings, final ImportListener<Christening> importListener) {
     // "KPersCode";"Taufkind";"Jahr";"Kirche";"FamCode";"MPersCode";"VaterName";"VaterVName";"Tätigkeit";"Quelle"
-    for (final String[] data : marriages) {
+    final int max = christenings.size();
+    int i = 1;
+    for (final String[] data : christenings) {
       final String kPersCode = data[0];
       final String taufKind = data[1];
       final String jahr = data[2];
@@ -50,9 +52,10 @@ public class ChristeningImportService implements ImportService<Christening> {
       final String vaterVName = data[7];
       final String taetigkeit = data[8];
       final String quelle = data[9];
-      importChristening(new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode)
+      importChristening(i, max, new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode)
           .personCode2(kPersCode).personCode2(mPersCode).reference(quelle).profession(taetigkeit).firstNameFather(vaterVName)
           .lastNameFather(vaterName), importListener);
+      i++;
     }
   }
 
@@ -81,7 +84,7 @@ public class ChristeningImportService implements ImportService<Christening> {
       christeningReader.readHeader();
       final List<String[]> christenings = christeningReader.readAll();
       if (importListener != null) {
-        importListener.startImport(Christening.class, christenings.size());
+        importListener.startImport(christenings.size());
       }
       return ImmutableList.copyOf(christenings);
     } catch (final IOException e) {

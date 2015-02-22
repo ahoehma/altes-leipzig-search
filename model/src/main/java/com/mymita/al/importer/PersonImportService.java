@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -44,30 +43,39 @@ public class PersonImportService implements ImportService<Person> {
     return null;
   }
 
+  private void deletePersons() {
+    LOGGER.debug("Delete all persons");
+    personRepository.deleteAll();
+  }
+
   @Override
-  @Transactional
   public void importData(final File file, final ImportListener<Person> importListener) {
     final List<String[]> persons = readPersons(file, importListener);
     if (persons == null) {
       LOGGER.warn("Nothing to import from person file '{}'", file.getAbsolutePath());
       return;
     }
-    LOGGER.debug("Delete all persons");
-    personRepository.deleteAll();
-    LOGGER.debug("Create '{}' persons ...", persons.size());
+    deletePersons();
     importPersons(persons, importListener);
-    LOGGER.debug("Created '{}' persons", persons.size());
+    LOGGER.debug("Added '{}' persons successfully", persons.size());
   }
 
-  private Person importPersonInternal(final Person person, final ImportListener<Person> importListener) {
-    final Person importedPerson = personRepository.save(person);
-    if (importListener != null) {
-      importListener.progressImport(person);
+  private Person importPerson(final int i, final int max, final Person person, final ImportListener<Person> importListener) {
+    try {
+      final Person importedPerson = personRepository.save(person);
+      if (importListener != null) {
+        importListener.progressImport(person, i, max);
+      }
+      return importedPerson;
+    } catch (final org.springframework.dao.DataIntegrityViolationException e) {
+      throw new org.springframework.dao.DataIntegrityViolationException(String.format("Can't import person '%s'", person), e);
     }
-    return importedPerson;
   }
 
   private void importPersons(final List<String[]> persons, final ImportListener<Person> importListener) {
+    final int max = persons.size();
+    int i = 1;
+    LOGGER.debug("Start adding '{}' persons", max);
     for (final String[] data : persons) {
       final String code = data[0];
       final String lastName = data[1];
@@ -80,14 +88,12 @@ public class PersonImportService implements ImportService<Person> {
       final String description = data[8];
       final String reference = data[9];
       final String link = data[10];
-      importPersonInternal(new Person().personCode(code).lastName(lastName).firstName(firstName).birthName(birthName).gender(gender)
-          .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description).reference(reference),
-          importListener);
+      importPerson(i, max,
+          new Person().personCode(code).lastName(lastName).firstName(firstName).birthName(birthName).gender(gender)
+          .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description).reference(reference)
+          .link(link), importListener);
+      i++;
     }
-  }
-
-  public void importPersons(final String csv, final ImportListener<Person> importListener) throws IOException {
-    importData(new File(csv), importListener);
   }
 
   @Nullable
@@ -99,7 +105,7 @@ public class PersonImportService implements ImportService<Person> {
       personReader.readHeader();
       final List<String[]> persons = personReader.readAll();
       if (importListener != null) {
-        importListener.startImport(Person.class, persons.size());
+        importListener.startImport(persons.size());
       }
       return ImmutableList.copyOf(persons);
     } catch (final IOException e) {

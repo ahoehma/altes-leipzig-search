@@ -29,14 +29,21 @@ public class PersonImportServiceTest extends AbstractTransactionalTestNGSpringCo
   @Test
   public void importCsv() throws Exception {
     personImportService.importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt"),
-        new CountingImportListener<Person>() {
+        new ImportListener<Person>() {
 
-      @Override
-      public void progressImport(final Person object) {
-        super.progressImport(object);
-        LOGGER.debug("[{}/{}] Imported person {}", count(object), max(object), object);
-      }
-    });
+          @Override
+          public void finishedImport() {
+          }
+
+          @Override
+          public void progressImport(final Person object, final int i, final int max) {
+            LOGGER.debug("[{}/{}] Imported person {}", i, max, object);
+          }
+
+          @Override
+          public void startImport(final int max) {
+          }
+        });
   }
 
   @BeforeTransaction

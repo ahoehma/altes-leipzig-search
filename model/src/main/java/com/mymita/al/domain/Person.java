@@ -28,6 +28,7 @@ public class Person {
   private String yearsOfLife;
   private String description;
   private String reference;
+  private String link;
 
   public Person birthName(final String birthName) {
     this.birthName = birthName;
@@ -91,6 +92,10 @@ public class Person {
     return lastName;
   }
 
+  public String getLink() {
+    return link;
+  }
+
   public String getPersonCode() {
     return personCode;
   }
@@ -124,6 +129,11 @@ public class Person {
     return this;
   }
 
+  public Person link(final String link) {
+    this.link = link;
+    return this;
+  }
+
   public Person personCode(final String code) {
     this.personCode = code;
     return this;
@@ -140,7 +150,8 @@ public class Person {
     builder.append("Person [id=").append(id).append(", personCode=").append(personCode).append(", firstName=").append(firstName)
         .append(", lastName=").append(lastName).append(", birthName=").append(birthName).append(", gender=").append(gender)
         .append(", yearOfBirth=").append(yearOfBirth).append(", yearOfDeath=").append(yearOfDeath).append(", yearsOfLife=")
-        .append(yearsOfLife).append(", description=").append(description).append(", reference=").append(reference).append("]");
+        .append(yearsOfLife).append(", description=").append(description).append(", reference=").append(reference).append(", link=")
+    .append(link).append("]");
     return builder.toString();
   }
 
