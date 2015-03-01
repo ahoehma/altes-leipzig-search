@@ -27,16 +27,13 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
-import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
@@ -70,37 +67,61 @@ public class AdminUI extends UI {
 
   private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 
-  private void addChristeningDeleteAll(final VerticalLayout result) {
-    result.addComponent(new Button("Delete all christenings", new Button.ClickListener() {
+  private void addChristening2Menu(final VerticalLayout content, final MenuBar data) {
+    final MenuItem menu = data.addItem("Taufen", null);
+    menu.addItem("Alle Zeigen", new Command() {
 
       @Override
-      public void buttonClick(final Button.ClickEvent event) {
-        christeningRepository.deleteAll();
+      public void menuSelected(final MenuItem selectedItem) {
+        content.removeAllComponents();
+        content.addComponent(createChristeningTab());
+        refreshChristeningContainer();
       }
-    }));
-  }
-
-  private void addChristeningImport(final VerticalLayout result) {
-    addImporter(result, "Start christening import", christeningImportService, ConcurrentUtils.wrap(new Runnable() {
+    });
+    menu.addItem("Importieren", new Command() {
 
       @Override
-      public void run() {
-        christeningContainer.removeAllItems();
-        christeningContainer.addAll(ImmutableList.copyOf(christeningRepository.findAll()));
-      }
-    }));
-  }
+      public void menuSelected(final MenuItem selectedItem) {
+        final Window window = new Window("Importieren");
+        final VerticalLayout content = new VerticalLayout();
+        addImporter(content, "Start Import Taufen", christeningImportService, ConcurrentUtils.wrap(new Runnable() {
 
-  @SuppressWarnings("serial")
-  private void addChristeningRefresh(final VerticalLayout result) {
-    result.addComponent(new Button("Refresh all christenings", new Button.ClickListener() {
+          @Override
+          public void run() {
+            refreshChristeningContainer();
+            window.close();
+          }
+        }));
+        window.setContent(content);
+        window.center();
+        window.setWidth(400, Unit.PIXELS);
+        window.setHeight(200, Unit.PIXELS);
+        getCurrent().addWindow(window);
+      }
+    });
+    menu.addItem("Alle löschen", new Command() {
 
       @Override
-      public void buttonClick(final Button.ClickEvent event) {
-        christeningContainer.removeAllItems();
-        christeningContainer.addAll(ImmutableList.copyOf(christeningRepository.findAll()));
+      public void menuSelected(final MenuItem selectedItem) {
+        ConfirmDialog.show(getCurrent(), "Bitte bestätigen:", "Alle Taufen löschen?", "Ja", "Nein", new ConfirmDialog.Listener() {
+
+          @Override
+          public void onClose(final ConfirmDialog dialog) {
+            if (dialog.isConfirmed()) {
+              christeningRepository.deleteAll();
+              refreshChristeningContainer();
+            }
+          }
+        });
       }
-    }));
+    });
+    menu.addItem("Ansicht aktualisieren", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        refreshPersonContainer();
+      }
+    });
   }
 
   private void addChristeningTable(final VerticalLayout result) {
@@ -159,36 +180,61 @@ public class AdminUI extends UI {
     result.addComponent(c);
   }
 
-  @SuppressWarnings("serial")
-  private void addMarriageDeleteAll(final VerticalLayout result) {
-    result.addComponent(new Button("Delete all marriages", new Button.ClickListener() {
+  private void addMarriage2Menu(final VerticalLayout content, final MenuBar data) {
+    final MenuItem menu = data.addItem("Hochzeiten", null);
+    menu.addItem("Alle Zeigen", new Command() {
 
       @Override
-      public void buttonClick(final Button.ClickEvent event) {
-        marriageRepository.deleteAll();
-      }
-    }));
-  }
-
-  private void addMarriageImport(final VerticalLayout result) {
-    addImporter(result, "Start marriage import", marriageImportService, ConcurrentUtils.wrap(new Runnable() {
-
-      @Override
-      public void run() {
+      public void menuSelected(final MenuItem selectedItem) {
+        content.removeAllComponents();
+        content.addComponent(createMarriageTab());
         refreshMarriageContainer();
       }
-    }));
-  }
-
-  @SuppressWarnings("serial")
-  private void addMarriageRefresh(final VerticalLayout result) {
-    result.addComponent(new Button("Refresh all marriages", new Button.ClickListener() {
+    });
+    menu.addItem("Importieren", new Command() {
 
       @Override
-      public void buttonClick(final Button.ClickEvent event) {
+      public void menuSelected(final MenuItem selectedItem) {
+        final Window window = new Window("Importieren");
+        final VerticalLayout content = new VerticalLayout();
+        addImporter(content, "Start Import Hochzeit", marriageImportService, ConcurrentUtils.wrap(new Runnable() {
+
+          @Override
+          public void run() {
+            refreshMarriageContainer();
+            window.close();
+          }
+        }));
+        window.setContent(content);
+        window.center();
+        window.setWidth(400, Unit.PIXELS);
+        window.setHeight(200, Unit.PIXELS);
+        getCurrent().addWindow(window);
+      }
+    });
+    menu.addItem("Alle löschen", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        ConfirmDialog.show(getCurrent(), "Bitte bestätigen:", "Alle Hochzeiten löschen?", "Ja", "Nein", new ConfirmDialog.Listener() {
+
+          @Override
+          public void onClose(final ConfirmDialog dialog) {
+            if (dialog.isConfirmed()) {
+              marriageRepository.deleteAll();
+              refreshMarriageContainer();
+            }
+          }
+        });
+      }
+    });
+    menu.addItem("Ansicht aktualisieren", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
         refreshMarriageContainer();
       }
-    }));
+    });
   }
 
   private void addMarriageTable(final VerticalLayout result) {
@@ -197,60 +243,27 @@ public class AdminUI extends UI {
     result.addComponent(c);
   }
 
-  private void addPersonTable(final VerticalLayout result) {
-    final Table c = new Table(null, personContainer);
-    c.setSizeFull();
-    result.addComponent(c);
-  }
-
-  private Component createChristeningTab() {
-    final VerticalLayout result = new VerticalLayout();
-    result.setSizeFull();
-    addChristeningTable(result);
-    addChristeningImport(result);
-    addChristeningDeleteAll(result);
-    addChristeningRefresh(result);
-    return result;
-  }
-
-  private Component createContent() {
-    final TabSheet ts = new TabSheet();
-    ts.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
-    final Component personTab = createPersonTab();
-    final Component marriageTab = createMarriageTab();
-    final Component christeningTab = createChristeningTab();
-    ts.addSelectedTabChangeListener(new SelectedTabChangeListener() {
-
-      @Override
-      public void selectedTabChange(final SelectedTabChangeEvent event) {
-        if (ts.getSelectedTab() == personTab) {
-          refreshPersonContainer();
-        }
-      }
-    });
-    ts.addTab(personTab, "Personen");
-    ts.addTab(marriageTab, "Hochzeiten");
-    ts.addTab(christeningTab, "Taufen");
-    final MenuBar menubar = new MenuBar();
-    final MenuItem data = menubar.addItem("Daten", null, null);
-    final MenuItem marriageMenu = data.addItem("Personen", new Command() {
+  private void addPerson2Menu(final VerticalLayout content, final MenuBar data) {
+    final MenuItem menu = data.addItem("Personen", null);
+    menu.addItem("Alle Zeigen", new Command() {
 
       @Override
       public void menuSelected(final MenuItem selectedItem) {
-        ts.setSelectedTab(personTab);
+        content.removeAllComponents();
+        content.addComponent(createPersonTab());
+        refreshPersonContainer();
       }
     });
-    marriageMenu.addItem("Importieren", new Command() {
+    menu.addItem("Importieren", new Command() {
 
       @Override
       public void menuSelected(final MenuItem selectedItem) {
         final Window window = new Window("Importieren");
         final VerticalLayout content = new VerticalLayout();
-        addImporter(content, "Start person import", personImportService, ConcurrentUtils.wrap(new Runnable() {
+        addImporter(content, "Start Import Personen", personImportService, ConcurrentUtils.wrap(new Runnable() {
 
           @Override
           public void run() {
-            LOGGER.info("Import finished");
             refreshPersonContainer();
             window.close();
           }
@@ -262,7 +275,7 @@ public class AdminUI extends UI {
         getCurrent().addWindow(window);
       }
     });
-    marriageMenu.addItem("Alle löschen", new Command() {
+    menu.addItem("Alle löschen", new Command() {
 
       @Override
       public void menuSelected(final MenuItem selectedItem) {
@@ -278,37 +291,48 @@ public class AdminUI extends UI {
         });
       }
     });
-    marriageMenu.addItem("Ansicht aktualisieren", new Command() {
+    menu.addItem("Ansicht aktualisieren", new Command() {
 
       @Override
       public void menuSelected(final MenuItem selectedItem) {
         refreshPersonContainer();
       }
     });
-    data.addItem("Hochzeiten", new Command() {
+  }
 
-      @Override
-      public void menuSelected(final MenuItem selectedItem) {
-        ts.setSelectedTab(marriageTab);
-      }
-    });
-    data.addItem("Taufen", new Command() {
+  private void addPersonTable(final VerticalLayout result) {
+    final Table c = new Table(null, personContainer);
+    c.setSizeFull();
+    result.addComponent(c);
+  }
 
-      @Override
-      public void menuSelected(final MenuItem selectedItem) {
-        ts.setSelectedTab(christeningTab);
-      }
-    });
-    return new VerticalLayout(menubar, ts);
+  private Component createChristeningTab() {
+    final VerticalLayout result = new VerticalLayout();
+    result.setSizeFull();
+    addChristeningTable(result);
+    return result;
+  }
+
+  private Component createContent() {
+    final Panel panel = new Panel("Administration");
+    panel.setSizeFull();
+    final VerticalLayout panelLayout = new VerticalLayout();
+    panel.setContent(panelLayout);
+    final VerticalLayout content = new VerticalLayout();
+    final MenuBar menubar = new MenuBar();
+    menubar.setWidth(100, Unit.PERCENTAGE);
+    addPerson2Menu(content, menubar);
+    addMarriage2Menu(content, menubar);
+    addChristening2Menu(content, menubar);
+    panelLayout.addComponent(menubar);
+    panelLayout.addComponent(content);
+    return panel;
   }
 
   private Component createMarriageTab() {
     final VerticalLayout result = new VerticalLayout();
     result.setSizeFull();
     addMarriageTable(result);
-    addMarriageImport(result);
-    addMarriageDeleteAll(result);
-    addMarriageRefresh(result);
     return result;
   }
 
@@ -324,6 +348,11 @@ public class AdminUI extends UI {
     getPage().setTitle("Altes Leipzig Suche - Administration");
     setSizeFull();
     setContent(createContent());
+  }
+
+  private void refreshChristeningContainer() {
+    christeningContainer.removeAllItems();
+    christeningContainer.addAll(ImmutableList.copyOf(christeningRepository.findAll()));
   }
 
   private void refreshMarriageContainer() {
