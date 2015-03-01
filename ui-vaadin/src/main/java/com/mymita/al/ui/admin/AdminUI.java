@@ -29,9 +29,10 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.NativeButton;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
+import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
@@ -65,7 +66,7 @@ public class AdminUI extends UI {
   private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(10));
 
   private void addChristeningDeleteAll(final VerticalLayout result) {
-    result.addComponent(new NativeButton("Delete all christenings", new Button.ClickListener() {
+    result.addComponent(new Button("Delete all christenings", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
@@ -87,7 +88,7 @@ public class AdminUI extends UI {
 
   @SuppressWarnings("serial")
   private void addChristeningRefresh(final VerticalLayout result) {
-    result.addComponent(new NativeButton("Refresh all christenings", new Button.ClickListener() {
+    result.addComponent(new Button("Refresh all christenings", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
@@ -153,7 +154,7 @@ public class AdminUI extends UI {
 
   @SuppressWarnings("serial")
   private void addMarriageDeleteAll(final VerticalLayout result) {
-    result.addComponent(new NativeButton("Delete all marriages", new Button.ClickListener() {
+    result.addComponent(new Button("Delete all marriages", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
@@ -175,7 +176,7 @@ public class AdminUI extends UI {
 
   @SuppressWarnings("serial")
   private void addMarriageRefresh(final VerticalLayout result) {
-    result.addComponent(new NativeButton("Refresh all marriages", new Button.ClickListener() {
+    result.addComponent(new Button("Refresh all marriages", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
@@ -193,13 +194,12 @@ public class AdminUI extends UI {
 
   @SuppressWarnings("serial")
   private void addPersonDeleteAll(final VerticalLayout result) {
-    result.addComponent(new NativeButton("Delete all persons", new Button.ClickListener() {
+    result.addComponent(new Button("Delete all persons", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
         personRepository.deleteAll();
-        personContainer.removeAllItems();
-        personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
+        refreshPersonTable();
       }
     }));
   }
@@ -210,20 +210,18 @@ public class AdminUI extends UI {
       @Override
       public void run() {
         LOGGER.info("Import finished");
-        personContainer.removeAllItems();
-        personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
+        refreshPersonTable();
       }
     }));
   }
 
   @SuppressWarnings("serial")
   private void addPersonRefresh(final VerticalLayout result) {
-    result.addComponent(new NativeButton("Refresh all persons", new Button.ClickListener() {
+    result.addComponent(new Button("Refresh all persons", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
-        personContainer.removeAllItems();
-        personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
+        refreshPersonTable();
       }
     }));
   }
@@ -246,9 +244,22 @@ public class AdminUI extends UI {
 
   private Component createContent() {
     final TabSheet ts = new TabSheet();
-    ts.addTab(createPersonTab(), "Person");
-    ts.addTab(createMarriageTab(), "Marriage");
-    ts.addTab(createChristeningTab(), "Christening");
+    ts.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
+    final Component personTab = createPersonTab();
+    final Component marriageTab = createMarriageTab();
+    final Component christeningTab = createChristeningTab();
+    ts.addSelectedTabChangeListener(new SelectedTabChangeListener() {
+
+      @Override
+      public void selectedTabChange(final SelectedTabChangeEvent event) {
+        if (ts.getSelectedTab() == personTab) {
+          refreshPersonTable();
+        }
+      }
+    });
+    ts.addTab(personTab, "Personen");
+    ts.addTab(marriageTab, "Hochzeiten");
+    ts.addTab(christeningTab, "Taufen");
     return new VerticalLayout(ts);
   }
 
@@ -277,5 +288,10 @@ public class AdminUI extends UI {
     getPage().setTitle("Altes Leipzig Suche - Administration");
     setSizeFull();
     setContent(createContent());
+  }
+
+  private void refreshPersonTable() {
+    personContainer.removeAllItems();
+    personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
   }
 }
