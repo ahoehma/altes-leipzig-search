@@ -60,10 +60,11 @@ public class PersonImportService implements ImportService<Person> {
       final String yearsOfLife = data[7];
       final String description = data[8];
       final String reference = data[9];
-      final String link = data[10];
+      final String image = data[10];
+      final String link = data[11];
       return new Person().personCode(code).lastName(lastName).firstName(firstName).birthName(birthName).gender(gender)
           .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description).reference(reference)
-          .link(link);
+          .link(link).image(image);
     }
   };
 
@@ -93,7 +94,7 @@ public class PersonImportService implements ImportService<Person> {
   public void importPersons(final List<String[]> persons, final ImportListener<Person> importListener) {
     final int max = persons.size();
     int i = 1;
-    final int chunkSize = 1000;
+    final int chunkSize = 5000;
     LOGGER.debug("Start adding given '{}' persons in chunks with '{}' persons", max, chunkSize);
     for (final List<String[]> data : Lists.partition(persons, chunkSize)) {
       try {
@@ -115,7 +116,6 @@ public class PersonImportService implements ImportService<Person> {
     try {
       final Reader csvFile = new InputStreamReader(new FileInputStream(file), Charsets.ISO_8859_1);
       final CSVReader<String[]> personReader = CSVReaderBuilder.newDefaultReader(csvFile);
-      // PersCode, Nachname, Vorname, Geburtsname, Sex, Geburtsjahr, Sterbejahr, Alter, Beschreibung, Quelle, Bild/Link
       personReader.readHeader();
       final List<String[]> persons = personReader.readAll();
       if (importListener != null) {

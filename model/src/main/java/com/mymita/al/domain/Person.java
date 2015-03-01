@@ -29,6 +29,7 @@ public class Person {
   private String description;
   private String reference;
   private String link;
+  private String image;
 
   public Person birthName(final String birthName) {
     this.birthName = birthName;
@@ -88,6 +89,10 @@ public class Person {
     return gender;
   }
 
+  public String getImage() {
+    return image;
+  }
+
   public String getLastName() {
     return lastName;
   }
@@ -124,6 +129,11 @@ public class Person {
     return result;
   }
 
+  public Person image(final String image) {
+    this.image = image;
+    return this;
+  }
+
   public Person lastName(final String lastName) {
     this.lastName = lastName;
     return this;
@@ -146,13 +156,10 @@ public class Person {
 
   @Override
   public String toString() {
-    final StringBuilder builder = new StringBuilder();
-    builder.append("Person [id=").append(id).append(", personCode=").append(personCode).append(", firstName=").append(firstName)
-        .append(", lastName=").append(lastName).append(", birthName=").append(birthName).append(", gender=").append(gender)
-        .append(", yearOfBirth=").append(yearOfBirth).append(", yearOfDeath=").append(yearOfDeath).append(", yearsOfLife=")
-        .append(yearsOfLife).append(", description=").append(description).append(", reference=").append(reference).append(", link=")
-    .append(link).append("]");
-    return builder.toString();
+    return String.format(
+        "Person [id=%s, personCode=%s, firstName=%s, lastName=%s, birthName=%s, gender=%s, yearOfBirth=%s, yearOfDeath=%s, "
+            + "yearsOfLife=%s, description=%s, reference=%s, link=%s, image=%s]", id, personCode, firstName, lastName, birthName, gender,
+            yearOfBirth, yearOfDeath, yearsOfLife, description, reference, link, image);
   }
 
   public Person yearOfBirth(final String yearOfBirth) {

@@ -98,7 +98,9 @@ public class AdminUI extends UI {
   }
 
   private void addChristeningTable(final VerticalLayout result) {
-    result.addComponent(new Table(null, christeningContainer));
+    final Table c = new Table(null, christeningContainer);
+    c.setSizeFull();
+    result.addComponent(c);
   }
 
   private <T> void addImporter(final VerticalLayout result, final String caption, final ImportService<T> importService,
@@ -184,7 +186,9 @@ public class AdminUI extends UI {
   }
 
   private void addMarriageTable(final VerticalLayout result) {
-    result.addComponent(new Table(null, marriageContainer));
+    final Table c = new Table(null, marriageContainer);
+    c.setSizeFull();
+    result.addComponent(c);
   }
 
   @SuppressWarnings("serial")
@@ -225,11 +229,14 @@ public class AdminUI extends UI {
   }
 
   private void addPersonTable(final VerticalLayout result) {
-    result.addComponent(new Table(null, personContainer));
+    final Table c = new Table(null, personContainer);
+    c.setSizeFull();
+    result.addComponent(c);
   }
 
   private Component createChristeningTab() {
     final VerticalLayout result = new VerticalLayout();
+    result.setSizeFull();
     addChristeningTable(result);
     addChristeningImport(result);
     addChristeningDeleteAll(result);
@@ -247,6 +254,7 @@ public class AdminUI extends UI {
 
   private Component createMarriageTab() {
     final VerticalLayout result = new VerticalLayout();
+    result.setSizeFull();
     addMarriageTable(result);
     addMarriageImport(result);
     addMarriageDeleteAll(result);
@@ -256,6 +264,7 @@ public class AdminUI extends UI {
 
   private Component createPersonTab() {
     final VerticalLayout result = new VerticalLayout();
+    result.setSizeFull();
     addPersonTable(result);
     addPersonImport(result);
     addPersonDeleteAll(result);
