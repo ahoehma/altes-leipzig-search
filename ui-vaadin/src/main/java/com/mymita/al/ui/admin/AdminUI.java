@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.vaadin.dialogs.ConfirmDialog;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -29,6 +30,9 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.Command;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
@@ -37,6 +41,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 @Configurable
@@ -146,7 +151,9 @@ public class AdminUI extends UI {
     upload.setButtonCaption(caption);
     upload.addSucceededListener(receiver);
     final HorizontalLayout c = new HorizontalLayout(upload, progressBar);
-    c.setWidth(700, Unit.PIXELS);
+    c.setSizeFull();
+    c.setSpacing(true);
+    c.setMargin(true);
     c.setComponentAlignment(upload, Alignment.MIDDLE_LEFT);
     c.setComponentAlignment(progressBar, Alignment.MIDDLE_RIGHT);
     result.addComponent(c);
@@ -168,8 +175,7 @@ public class AdminUI extends UI {
 
       @Override
       public void run() {
-        marriageContainer.removeAllItems();
-        marriageContainer.addAll(ImmutableList.copyOf(marriageRepository.findAll()));
+        refreshMarriageContainer();
       }
     }));
   }
@@ -180,8 +186,7 @@ public class AdminUI extends UI {
 
       @Override
       public void buttonClick(final Button.ClickEvent event) {
-        marriageContainer.removeAllItems();
-        marriageContainer.addAll(ImmutableList.copyOf(marriageRepository.findAll()));
+        refreshMarriageContainer();
       }
     }));
   }
@@ -190,40 +195,6 @@ public class AdminUI extends UI {
     final Table c = new Table(null, marriageContainer);
     c.setSizeFull();
     result.addComponent(c);
-  }
-
-  @SuppressWarnings("serial")
-  private void addPersonDeleteAll(final VerticalLayout result) {
-    result.addComponent(new Button("Delete all persons", new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(final Button.ClickEvent event) {
-        personRepository.deleteAll();
-        refreshPersonTable();
-      }
-    }));
-  }
-
-  private void addPersonImport(final VerticalLayout result) {
-    addImporter(result, "Start person import", personImportService, ConcurrentUtils.wrap(new Runnable() {
-
-      @Override
-      public void run() {
-        LOGGER.info("Import finished");
-        refreshPersonTable();
-      }
-    }));
-  }
-
-  @SuppressWarnings("serial")
-  private void addPersonRefresh(final VerticalLayout result) {
-    result.addComponent(new Button("Refresh all persons", new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(final Button.ClickEvent event) {
-        refreshPersonTable();
-      }
-    }));
   }
 
   private void addPersonTable(final VerticalLayout result) {
@@ -253,14 +224,82 @@ public class AdminUI extends UI {
       @Override
       public void selectedTabChange(final SelectedTabChangeEvent event) {
         if (ts.getSelectedTab() == personTab) {
-          refreshPersonTable();
+          refreshPersonContainer();
         }
       }
     });
     ts.addTab(personTab, "Personen");
     ts.addTab(marriageTab, "Hochzeiten");
     ts.addTab(christeningTab, "Taufen");
-    return new VerticalLayout(ts);
+    final MenuBar menubar = new MenuBar();
+    final MenuItem data = menubar.addItem("Daten", null, null);
+    final MenuItem marriageMenu = data.addItem("Personen", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        ts.setSelectedTab(personTab);
+      }
+    });
+    marriageMenu.addItem("Importieren", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        final Window window = new Window("Importieren");
+        final VerticalLayout content = new VerticalLayout();
+        addImporter(content, "Start person import", personImportService, ConcurrentUtils.wrap(new Runnable() {
+
+          @Override
+          public void run() {
+            LOGGER.info("Import finished");
+            refreshPersonContainer();
+            window.close();
+          }
+        }));
+        window.setContent(content);
+        window.center();
+        window.setWidth(400, Unit.PIXELS);
+        window.setHeight(200, Unit.PIXELS);
+        getCurrent().addWindow(window);
+      }
+    });
+    marriageMenu.addItem("Alle löschen", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        ConfirmDialog.show(getCurrent(), "Bitte bestätigen:", "Alle Personen löschen?", "Ja", "Nein", new ConfirmDialog.Listener() {
+
+          @Override
+          public void onClose(final ConfirmDialog dialog) {
+            if (dialog.isConfirmed()) {
+              personRepository.deleteAll();
+              refreshPersonContainer();
+            }
+          }
+        });
+      }
+    });
+    marriageMenu.addItem("Ansicht aktualisieren", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        refreshPersonContainer();
+      }
+    });
+    data.addItem("Hochzeiten", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        ts.setSelectedTab(marriageTab);
+      }
+    });
+    data.addItem("Taufen", new Command() {
+
+      @Override
+      public void menuSelected(final MenuItem selectedItem) {
+        ts.setSelectedTab(christeningTab);
+      }
+    });
+    return new VerticalLayout(menubar, ts);
   }
 
   private Component createMarriageTab() {
@@ -277,9 +316,6 @@ public class AdminUI extends UI {
     final VerticalLayout result = new VerticalLayout();
     result.setSizeFull();
     addPersonTable(result);
-    addPersonImport(result);
-    addPersonDeleteAll(result);
-    addPersonRefresh(result);
     return result;
   }
 
@@ -290,7 +326,12 @@ public class AdminUI extends UI {
     setContent(createContent());
   }
 
-  private void refreshPersonTable() {
+  private void refreshMarriageContainer() {
+    marriageContainer.removeAllItems();
+    marriageContainer.addAll(ImmutableList.copyOf(marriageRepository.findAll()));
+  }
+
+  private void refreshPersonContainer() {
     personContainer.removeAllItems();
     personContainer.addAll(ImmutableList.copyOf(personRepository.findAll()));
   }
