@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.mymita.al.domain.Christening;
 import com.mymita.al.service.ChristeningService;
@@ -17,7 +17,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -32,14 +31,12 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
 @Configurable
 @Theme("default")
 @PreserveOnRefresh
 public class Search extends AbstractSearch<Christening> {
-
-  private static final long serialVersionUID = -6780876618168616688L;
 
   @Autowired
   transient ChristeningService christeningService;
@@ -67,7 +64,7 @@ public class Search extends AbstractSearch<Christening> {
       @Override
       public void buttonClick(final ClickEvent event) {
         final String nameValue = name(name.getValue());
-        final String yearValue = String.valueOf(Objects.firstNonNull(number(year.getValue()), ""));
+        final String yearValue = String.valueOf(MoreObjects.firstNonNull(number(year.getValue()), ""));
         showHits(ImmutableList.copyOf(christeningService.find(nameValue, yearValue)));
       }
     });
@@ -101,21 +98,19 @@ public class Search extends AbstractSearch<Christening> {
   protected void showResultDetails(final CustomLayout content, final Table resultTable, final Christening result) {
 
     final Panel descriptionPanel = new Panel();
-    descriptionPanel.setStyleName("description");
-    descriptionPanel.addStyleName(Reindeer.PANEL_LIGHT);
+    descriptionPanel.setStyleName(ValoTheme.PANEL_BORDERLESS);
     descriptionPanel.setCaption("Beschreibung");
     descriptionPanel.setHeight(130, Unit.PIXELS);
-    descriptionPanel.setWidth(100, Unit.PERCENTAGE);
+    descriptionPanel.setWidth(470, Unit.PIXELS);
     final VerticalLayout infoPanelLayout = new VerticalLayout();
     infoPanelLayout.addComponent(new VerticalLayout(new Label("Code: " + (result != null ? result.getFamilyCode() : "")), new Label(
         "Beruf: " + (result != null ? result.getProfession() : ""))));
     descriptionPanel.setContent(infoPanelLayout);
 
     final Panel referencePanel = new Panel();
-    referencePanel.setStyleName(Reindeer.PANEL_LIGHT);
+    referencePanel.setStyleName(ValoTheme.PANEL_BORDERLESS);
     referencePanel.setCaption("Quelle / Ersterwähnung");
-    referencePanel.setHeight(40, Unit.PIXELS);
-    referencePanel.setWidth(100, Unit.PERCENTAGE);
+    referencePanel.setWidth(470, Unit.PIXELS);
     final VerticalLayout referencePanelLayout = new VerticalLayout();
     referencePanelLayout.setStyleName("reference-panel");
     referencePanelLayout.setSizeFull();
@@ -123,50 +118,34 @@ public class Search extends AbstractSearch<Christening> {
     referencePanel.setContent(referencePanelLayout);
 
     final GridLayout infos = new GridLayout(2, 3);
+    infos.setSizeFull();
     infos.setStyleName("result-details");
-    infos.setMargin(new MarginInfo(true, false, false, false));
     infos.setSpacing(true);
-    infos.setWidth(100, Unit.PERCENTAGE);
-
     infos.addComponent(descriptionPanel, 0, 1, 1, 1);
     infos.addComponent(referencePanel, 0, 2, 1, 2);
     infos.setComponentAlignment(descriptionPanel, Alignment.TOP_LEFT);
     infos.setComponentAlignment(referencePanel, Alignment.BOTTOM_LEFT);
-
-    content.removeComponent("help");
-    final Label icon = new Label("<i class=\"fi-info help\"/>", ContentMode.HTML);
-    if (resultTable.size() == 0) {
-      final Label hint = new Label("Bitte starten Sie die Suche.");
-      hint.setStyleName("hint");
-      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
-      hintLayout.setSpacing(true);
-      hintLayout.setHeight(40, Unit.PIXELS);
-      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
-      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
-      content.addComponent(hintLayout, "help");
-    } else if (resultTable.size() > 0 && result == null) {
-      final Label hint = new Label("Bitte klicken Sie auf ein Ergebnis um weitere Informationen zu erhalten.");
-      hint.setStyleName("hint");
-      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
-      hintLayout.setSpacing(true);
-      hintLayout.setHeight(40, Unit.PIXELS);
-      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
-      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
-      content.addComponent(hintLayout, "help");
-    } else if (resultTable.size() > 0 && result != null) {
-      final Label hint = new Label("Klicken Sie bitte hier um weitere Informationen zur gewählten Taufe zu erfragen");
-      hint.setStyleName("hint");
-      hint.addStyleName("contact");
-      new BrowserWindowOpener(new ExternalResource("mailto:wehlmann@altes-leipzig.de?subject=Detailanfrage für FamilienCode '"
-          + result.getFamilyCode() + "'")).extend(hint);
-      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
-      hintLayout.setSpacing(true);
-      hintLayout.setHeight(40, Unit.PIXELS);
-      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
-      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
-      content.addComponent(hintLayout, "help");
-    }
     content.removeComponent("details");
     content.addComponent(infos, "details");
+
+    final HorizontalLayout help = new HorizontalLayout();
+    help.setStyleName("help");
+    help.setMargin(true);
+    if (resultTable.size() == 0) {
+      final Label hint = new Label("<i class=\"fi-info help\"/> Bitte starten Sie die Suche.", ContentMode.HTML);
+      help.addComponent(hint);
+    } else if (resultTable.size() > 0 && result == null) {
+      final Label hint = new Label("<i class=\"fi-info help\"/> Bitte klicken Sie auf ein Ergebnis um weitere Informationen zu sehen.",
+          ContentMode.HTML);
+      help.addComponent(hint);
+    } else if (resultTable.size() > 0 && result != null) {
+      final Label hint = new Label("<i class=\"fi-info help\"/> Hier erhalten Sie weitere Informationen per Email", ContentMode.HTML);
+      hint.addStyleName("email-contact");
+      new BrowserWindowOpener(new ExternalResource("mailto:wehlmann@altes-leipzig.de?subject=Detailanfrage für FamilienCode '"
+          + result.getFamilyCode() + "'")).extend(hint);
+      help.addComponent(hint);
+    }
+    content.removeComponent("help");
+    content.addComponent(help, "help");
   }
 }

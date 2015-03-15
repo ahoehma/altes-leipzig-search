@@ -3,11 +3,14 @@ package com.mymita.al.ui.search.person;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.Nullable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.io.ClassPathResource;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.mymita.al.domain.Person;
 import com.mymita.al.domain.Person.Gender;
@@ -20,31 +23,30 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect.ItemDescriptionGenerator;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.NativeButton;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
 @Configurable
 @Theme("default")
 @PreserveOnRefresh
 public class Search extends AbstractSearch<Person> {
-
-  private static final long serialVersionUID = -6780876618168616688L;
 
   @Autowired
   transient PersonService personService;
@@ -110,24 +112,21 @@ public class Search extends AbstractSearch<Person> {
     name.setNullSettingAllowed(true);
     name.setNullRepresentation("");
     name.setValue(null);
-    name.setStyleName("search");
     name.setWidth("150px");
     name.setRequired(false);
     name.setValidationVisible(false);
     name.focus();
     final TextField yearOfBirth = new TextField("Geburtsjahr");
-    yearOfBirth.setStyleName("search");
     yearOfBirth.setWidth("80px");
     final TextField yearOfDeath = new TextField("Sterbejahr");
-    yearOfDeath.setStyleName("search");
     yearOfDeath.setWidth("80px");
-    final Button search = new NativeButton("Suche starten", new Button.ClickListener() {
+    final Button search = new Button("Suche starten", new Button.ClickListener() {
 
       @Override
       public void buttonClick(final ClickEvent event) {
         final String nameValue = name(name.getValue());
-        final String yearOfBirthValue = String.valueOf(Objects.firstNonNull(number(yearOfBirth.getValue()), ""));
-        final String yearOfDeathValue = String.valueOf(Objects.firstNonNull(number(yearOfDeath.getValue()), ""));
+        final String yearOfBirthValue = String.valueOf(MoreObjects.firstNonNull(number(yearOfBirth.getValue()), ""));
+        final String yearOfDeathValue = String.valueOf(MoreObjects.firstNonNull(number(yearOfDeath.getValue()), ""));
         showHits(ImmutableList.copyOf(personService.find(nameValue, yearOfBirthValue, yearOfDeathValue)));
       }
     });
@@ -151,7 +150,7 @@ public class Search extends AbstractSearch<Person> {
     resultTable.setColumnHeader("yearOfBirth", "Geboren");
     resultTable.setColumnHeader("yearOfDeath", "Gestorben");
     resultTable.setColumnHeader("yearsOfLife", "Alter");
-    resultTable.setColumnWidth("firstName", 100);
+    resultTable.setColumnWidth("firstName", 140);
     resultTable.setColumnWidth("birthName", 100);
     resultTable.setColumnWidth("lastName", 100);
     resultTable.setColumnWidth("gender", 35);
@@ -162,7 +161,7 @@ public class Search extends AbstractSearch<Person> {
     resultTable.setColumnAlignment("yearOfDeath", Align.CENTER);
     resultTable.setColumnAlignment("gender", Align.CENTER);
     resultTable.setVisibleColumns(new Object[] { "lastName", "birthName", "firstName", "gender", "yearOfBirth", "yearOfDeath",
-        "yearsOfLife" });
+    "yearsOfLife" });
     resultTable.setItemDescriptionGenerator(new ItemDescriptionGenerator() {
 
       @Override
@@ -198,92 +197,96 @@ public class Search extends AbstractSearch<Person> {
   }
 
   @Override
-  protected void showResultDetails(final CustomLayout content, final Table resultTable, final Person result) {
+  protected void showResultDetails(final CustomLayout content, final Table resultTable, @Nullable final Person result) {
 
     final Panel descriptionPanel = new Panel();
-    descriptionPanel.setStyleName("description");
-    descriptionPanel.addStyleName(Reindeer.PANEL_LIGHT);
+    descriptionPanel.setStyleName(ValoTheme.PANEL_BORDERLESS);
     descriptionPanel.setCaption("Beschreibung");
     descriptionPanel.setHeight(130, Unit.PIXELS);
-    descriptionPanel.setWidth(450, Unit.PIXELS);
+    descriptionPanel.setWidth(470, Unit.PIXELS);
     final VerticalLayout infoPanelLayout = new VerticalLayout();
     infoPanelLayout.addComponent(new Label("Code: " + (result != null ? result.getPersonCode() : "")));
     infoPanelLayout.addComponent(new Label(result != null ? result.getDescription() : ""));
     descriptionPanel.setContent(infoPanelLayout);
 
     final Panel imagePanel = new Panel();
-    imagePanel.setStyleName(Reindeer.PANEL_LIGHT);
+    imagePanel.setStyleName(ValoTheme.PANEL_BORDERLESS);
+    imagePanel.addStyleName("image");
     imagePanel.setCaption("Bild/Vorschau");
     imagePanel.setHeight(100, Unit.PERCENTAGE);
     imagePanel.setWidth(220, Unit.PIXELS);
-    final VerticalLayout imagePanelLayout = new VerticalLayout();
-    imagePanelLayout.setStyleName("image-panel");
-    imagePanelLayout.setSizeFull();
-    final Label human = new Label("<i class=\"fi-torso image-preview\"/>", ContentMode.HTML);
-    human.setSizeUndefined();
-    imagePanelLayout.addComponent(human);
-    imagePanelLayout.setComponentAlignment(human, Alignment.MIDDLE_CENTER);
-    imagePanel.setContent(imagePanelLayout);
+    if (result != null && !Strings.isNullOrEmpty(result.getImage())) {
+      final HorizontalLayout imagePanelLayout = new HorizontalLayout();
+      imagePanelLayout.setSizeFull();
+      imagePanelLayout.setStyleName("image-panel");
+      final Image image = new Image(null, new ExternalResource("http://www.altes-leipzig.de/quelle/tumb/" + result.getImage() + ".jpg"));
+      image.setSizeFull();
+      imagePanelLayout.addComponent(image);
+      imagePanelLayout.setComponentAlignment(image, Alignment.MIDDLE_CENTER);
+      imagePanel.setContent(imagePanelLayout);
+    } else {
+      final Label human = new Label("<i class=\"fi-torso image-preview\"/>", ContentMode.HTML);
+      human.setSizeUndefined();
+      final CssLayout imagePanelLayout = new CssLayout();
+      imagePanelLayout.setStyleName("image-panel");
+      imagePanel.setContent(imagePanelLayout);
+    }
 
     final Panel referencePanel = new Panel();
-    referencePanel.setStyleName(Reindeer.PANEL_LIGHT);
+    referencePanel.setStyleName(ValoTheme.PANEL_BORDERLESS);
     referencePanel.setCaption("Quelle / Ersterwähnung");
-    referencePanel.setHeight(40, Unit.PIXELS);
-    referencePanel.setWidth(450, Unit.PIXELS);
+    referencePanel.setWidth(470, Unit.PIXELS);
     final VerticalLayout referencePanelLayout = new VerticalLayout();
     referencePanelLayout.setStyleName("reference-panel");
     referencePanelLayout.setSizeFull();
     referencePanelLayout.addComponent(new Label(result != null ? result.getReference() : ""));
     referencePanel.setContent(referencePanelLayout);
 
-    final GridLayout infos = new GridLayout(2, 3);
-    infos.setStyleName("result-details");
-    infos.setMargin(new MarginInfo(true, false, false, false));
-    infos.setSpacing(true);
-    infos.setWidth(100, Unit.PERCENTAGE);
+    final Panel linkPanel = new Panel();
+    linkPanel.setStyleName(ValoTheme.PANEL_BORDERLESS);
+    linkPanel.setCaption("Weitere Informationen");
+    linkPanel.setWidth(100, Unit.PERCENTAGE);
+    final VerticalLayout linkPanelLayout = new VerticalLayout();
+    linkPanelLayout.setStyleName("link-panel");
+    linkPanelLayout.setSizeFull();
+    linkPanel.setContent(linkPanelLayout);
+    if (result != null) {
+      final String link = result.getLink().replace("#", "");
+      final Link externalLink = new Link(link, new ExternalResource(link));
+      externalLink.setTargetName("_blank");
+      linkPanelLayout.addComponent(externalLink);
+    }
 
+    final GridLayout infos = new GridLayout(2, 4);
+    infos.setSizeFull();
+    infos.setStyleName("result-details");
+    infos.setWidth(100, Unit.PERCENTAGE);
     infos.addComponent(descriptionPanel, 0, 1);
     infos.addComponent(referencePanel, 0, 2);
     infos.addComponent(imagePanel, 1, 1, 1, 2);
-    infos.setComponentAlignment(imagePanel, Alignment.MIDDLE_RIGHT);
-    infos.setComponentAlignment(descriptionPanel, Alignment.TOP_LEFT);
-    infos.setComponentAlignment(referencePanel, Alignment.BOTTOM_LEFT);
+    infos.addComponent(linkPanel, 0, 3, 1, 3);
     infos.setRowExpandRatio(0, 0);
-
-    content.removeComponent("help");
-    final Label icon = new Label("<i class=\"fi-info help\"/>", ContentMode.HTML);
-    if (resultTable.size() == 0) {
-      final Label hint = new Label("Bitte starten Sie die Suche.");
-      hint.setStyleName("hint");
-      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
-      hintLayout.setSpacing(true);
-      hintLayout.setHeight(40, Unit.PIXELS);
-      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
-      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
-      content.addComponent(hintLayout, "help");
-    } else if (resultTable.size() > 0 && result == null) {
-      final Label hint = new Label("Bitte klicken Sie auf ein Ergebnis um weitere Informationen zu erhalten.");
-      hint.setStyleName("hint");
-      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
-      hintLayout.setSpacing(true);
-      hintLayout.setHeight(40, Unit.PIXELS);
-      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
-      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
-      content.addComponent(hintLayout, "help");
-    } else if (resultTable.size() > 0 && result != null) {
-      final Label hint = new Label("Klicken Sie bitte hier um weitere Informationen zur gewählten Person zu erfragen");
-      hint.setStyleName("hint");
-      hint.addStyleName("contact");
-      new BrowserWindowOpener(new ExternalResource("mailto:wehlmann@altes-leipzig.de?subject=Detailanfrage für PersonenCode '"
-          + result.getPersonCode() + "'")).extend(hint);
-      final HorizontalLayout hintLayout = new HorizontalLayout(icon, hint);
-      hintLayout.setSpacing(true);
-      hintLayout.setHeight(40, Unit.PIXELS);
-      hintLayout.setComponentAlignment(icon, Alignment.MIDDLE_LEFT);
-      hintLayout.setComponentAlignment(hint, Alignment.MIDDLE_LEFT);
-      content.addComponent(hintLayout, "help");
-    }
     content.removeComponent("details");
     content.addComponent(infos, "details");
+
+    final HorizontalLayout help = new HorizontalLayout();
+    help.setStyleName("help");
+    help.setMargin(true);
+    if (resultTable.size() == 0) {
+      final Label hint = new Label("<i class=\"fi-info help\"/> Bitte starten Sie die Suche.", ContentMode.HTML);
+      help.addComponent(hint);
+    } else if (resultTable.size() > 0 && result == null) {
+      final Label hint = new Label("<i class=\"fi-info help\"/> Bitte klicken Sie auf ein Ergebnis um weitere Informationen zu sehen.",
+          ContentMode.HTML);
+      help.addComponent(hint);
+    } else if (resultTable.size() > 0 && result != null) {
+      final Label hint = new Label("<i class=\"fi-info help\"/> Hier erhalten Sie weitere Informationen per Email", ContentMode.HTML);
+      hint.addStyleName("email-contact");
+      new BrowserWindowOpener(new ExternalResource("mailto:wehlmann@altes-leipzig.de?subject=Detailanfrage für PersonenCode '"
+          + result.getPersonCode() + "'")).extend(hint);
+      help.addComponent(hint);
+    }
+    content.removeComponent("help");
+    content.addComponent(help, "help");
   }
 }
