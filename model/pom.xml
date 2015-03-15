@@ -9,7 +9,7 @@
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
   <properties>
-    <querydsl.version>3.6.1</querydsl.version>
+    <querydsl.version>3.6.2</querydsl.version>
     <hibernate-entitymanager.version>4.3.8.Final</hibernate-entitymanager.version>
   </properties>
   <dependencies>
