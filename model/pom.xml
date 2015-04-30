@@ -8,6 +8,10 @@
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../parent/pom.xml</relativePath>
   </parent>
+  <properties>
+    <querydsl.version>3.6.3</querydsl.version>
+    <hibernate-entitymanager.version>4.3.9.Final</hibernate-entitymanager.version>
+  </properties>
   <dependencies>
     <!-- jpa -->
     <dependency>
@@ -82,10 +86,6 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>aspectj-maven-plugin</artifactId>
