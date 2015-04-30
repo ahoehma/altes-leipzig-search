@@ -11,11 +11,11 @@
   <artifactId>ui-vaadin</artifactId>
   <packaging>war</packaging>
   <properties>
-    <spring-security.version>4.0.0.M2</spring-security.version>
+    <spring-security.version>4.0.1.RELEASE</spring-security.version>
     <vaadin.version>7.4.4</vaadin.version>
     <jetty.port>8080</jetty.port>
     <jetty.secure.port>8443</jetty.secure.port>
-    <jetty.version>9.2.6.v20141205</jetty.version>
+    <jetty.version>9.2.10.v20150310</jetty.version>
   </properties>
   <dependencyManagement>
     <dependencies>
