@@ -19,9 +19,10 @@
   <http pattern="/VAADIN/**" security="none"/>
   <http pattern="/main/**" security="none"/>
 
-  <http auto-config="true">
+  <http auto-config="true" use-expressions="true">
     <http-basic/>
-    <intercept-url pattern="/admin/**" access="ROLE_ADMIN" requires-channel="any"/>
+    <csrf disabled="true"/>
+    <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" requires-channel="any"/>
   </http>
 
   <beans:bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler">
