@@ -38,7 +38,7 @@
     <compiler.source.version>1.7</compiler.source.version>
     <compiler.target.version>1.7</compiler.target.version>
     <aspectj.version>1.8.5</aspectj.version>
-    <slf4j.version>1.7.7</slf4j.version>
+    <slf4j.version>1.7.12</slf4j.version>
     <logback.version>1.1.2</logback.version>
     <guava.version>18.0</guava.version>
     <jodatime.version>2.7</jodatime.version>
