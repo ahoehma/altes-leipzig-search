@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/ahoehma/altes-leipzig-search.svg?branch=master)](https://travis-ci.org/ahoehma/altes-leipzig-search)
-[![wercker status](https://app.wercker.com/status/554c6d26676bb8c31f06cc0d/m "wercker status")](https://app.wercker.com/project/bykey/554c6d26676bb8c31f06cc0d)
+[![wercker status](https://app.wercker.com/status/b1b70360527c4912a5527c73d3c79caf/m "wercker status")](https://app.wercker.com/project/bykey/b1b70360527c4912a5527c73d3c79caf)
 [![Dependency Status](https://www.versioneye.com/user/projects/5494867edd709d811f000591/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5494867edd709d811f000591)
 
 Altes Leipzig Search
