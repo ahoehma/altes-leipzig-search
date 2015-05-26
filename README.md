@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/ahoehma/altes-leipzig-search.svg?branch=master)](https://travis-ci.org/ahoehma/altes-leipzig-search)
 [![Dependency Status](https://www.versioneye.com/user/projects/5494867edd709d811f000591/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5494867edd709d811f000591)
-
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ahoehma/altes-leipzig-search/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 [![wercker status](https://app.wercker.com/status/b1b70360527c4912a5527c73d3c79caf/m "wercker status")](https://app.wercker.com/project/bykey/b1b70360527c4912a5527c73d3c79caf)
 
@@ -16,5 +16,5 @@ Search Webapp for www.altes-leipzig.de
 * Foundation Icon Fonts 3 - http://zurb.com/playground/foundation-icon-fonts-3
 
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ahoehma/altes-leipzig-search/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
 
