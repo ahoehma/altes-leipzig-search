@@ -14,3 +14,7 @@ Search Webapp for www.altes-leipzig.de
 * SpringData - http://www.springsource.org/spring-data
 * Guava - https://code.google.com/p/guava-libraries/
 * Foundation Icon Fonts 3 - http://zurb.com/playground/foundation-icon-fonts-3
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ahoehma/altes-leipzig-search/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
