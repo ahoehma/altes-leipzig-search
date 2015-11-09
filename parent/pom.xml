@@ -168,11 +168,6 @@
         <version>${aspectj.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.mymita.al</groupId>
-        <artifactId>model</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>${testng.version}</version>
