@@ -16,7 +16,7 @@
     <vaadin.pagedtable.version>0.6.5</vaadin.pagedtable.version>
     <vaadin.confirmdialog.version>2.1.2</vaadin.confirmdialog.version>
     <h2.version>1.4.190</h2.version>
-    <jetty.version>9.3.6.v20151106</jetty.version>
+    <jetty.version>9.2.14.v20151106</jetty.version>
     <jetty.spdy.version>9.2.14.v20151106</jetty.spdy.version>
     <jetty.port>8080</jetty.port>
     <jetty.secure.port>8443</jetty.secure.port>
