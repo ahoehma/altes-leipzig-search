@@ -9,7 +9,7 @@ Altes Leipzig Search
 
 Search Webapp for www.altes-leipzig.de
 
-* Vaadin 7.4 - https://vaadin.com/de/home
+* Vaadin 7.5 - https://vaadin.com/de/home
 * Spring - http://www.springsource.org/
 * SpringData - http://www.springsource.org/spring-data
 * Guava - https://code.google.com/p/guava-libraries/
