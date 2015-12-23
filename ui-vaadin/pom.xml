@@ -11,11 +11,15 @@
   <artifactId>ui-vaadin</artifactId>
   <packaging>war</packaging>
   <properties>
-    <spring-security.version>4.0.1.RELEASE</spring-security.version>
-    <vaadin.version>7.4.4</vaadin.version>
+    <spring-security.version>4.0.3.RELEASE</spring-security.version>
+    <vaadin.version>7.5.10</vaadin.version>
+    <vaadin.pagedtable.version>0.6.5</vaadin.pagedtable.version>
+    <vaadin.confirmdialog.version>2.1.2</vaadin.confirmdialog.version>
+    <h2.version>1.4.190</h2.version>
+    <jetty.version>9.3.6.v20151106</jetty.version>
+    <jetty.spdy.version>9.2.14.v20151106</jetty.spdy.version>
     <jetty.port>8080</jetty.port>
     <jetty.secure.port>8443</jetty.secure.port>
-    <jetty.version>9.2.10.v20150310</jetty.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -91,12 +95,12 @@
     <dependency>
       <groupId>org.vaadin.addons</groupId>
       <artifactId>pagedtable</artifactId>
-      <version>0.6.5</version>
+      <version>${vaadin.pagedtable.version}</version>
     </dependency>
     <dependency>
       <groupId>org.vaadin.addon</groupId>
       <artifactId>confirmdialog</artifactId>
-      <version>2.1.2</version>
+      <version>${vaadin.confirmdialog.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -114,7 +118,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.187</version>
+      <version>${h2.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>
@@ -201,7 +205,7 @@
           <dependency>
             <groupId>org.eclipse.jetty.spdy</groupId>
             <artifactId>spdy-http-server</artifactId>
-            <version>${jetty.version}</version>
+            <version>${jetty.spdy.version}</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -237,18 +241,6 @@
           <storepass>123geheim</storepass>
           <alias>jetty-ws</alias>
           <keyalg>RSA</keyalg>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.jelastic</groupId>
-        <artifactId>jelastic-maven-plugin</artifactId>
-        <version>1.7-SNAPSHOT</version>
-        <configuration>
-          <email>${jelastic.login}</email>
-          <password>${jelastic.password}</password>
-          <context>altes-leipzig-ui-vaadin</context>
-          <environment>mymita</environment>
-          <api_hoster>app.jelastic.dogado.eu</api_hoster>
         </configuration>
       </plugin>
     </plugins>
