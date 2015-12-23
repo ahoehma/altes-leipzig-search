@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.mymita.al.importer.ImportListener;
@@ -54,7 +55,7 @@ class ImportWorker<T> implements Runnable {
   @Override
   public void run() {
     try {
-      importService.importData(file, importListener);
+      importService.importData(new FileSystemResource(file), importListener);
     } catch (final DataIntegrityViolationException e) {
       LOGGER.error("Can't successfull import all data", e);
       Notification.show("Import error", e.getMessage(), Type.ERROR_MESSAGE);

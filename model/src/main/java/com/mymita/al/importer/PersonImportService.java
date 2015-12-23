@@ -1,7 +1,5 @@
 package com.mymita.al.importer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -12,6 +10,7 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,20 +28,6 @@ import com.mymita.al.repository.PersonRepository;
 
 @Service
 public class PersonImportService implements ImportService<Person> {
-
-  @Nullable
-  private static Gender asGender(final String value) {
-    if (value == null || value.trim().isEmpty()) {
-      return null;
-    }
-    if (value.equals("m")) {
-      return Gender.MALE;
-    }
-    if (value.equals("w")) {
-      return Gender.FEMALE;
-    }
-    return null;
-  }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonImportService.class);
 
@@ -68,6 +53,20 @@ public class PersonImportService implements ImportService<Person> {
     }
   };
 
+  @Nullable
+  private static Gender asGender(final String value) {
+    if (value == null || value.trim().isEmpty()) {
+      return null;
+    }
+    if (value.equals("m")) {
+      return Gender.MALE;
+    }
+    if (value.equals("w")) {
+      return Gender.FEMALE;
+    }
+    return null;
+  }
+
   @Autowired
   transient PersonRepository personRepository;
 
@@ -79,10 +78,10 @@ public class PersonImportService implements ImportService<Person> {
   }
 
   @Override
-  public void importData(final File file, final ImportListener<Person> importListener) {
-    final List<String[]> persons = readPersons(file, importListener);
+  public void importData(final Resource resource, final ImportListener<Person> importListener) {
+    final List<String[]> persons = readPersons(resource, importListener);
     if (persons == null) {
-      LOGGER.warn("Nothing to import from person file '{}'", file.getAbsolutePath());
+      LOGGER.warn("Nothing to import persons from '{}'", resource);
       return;
     }
     deletePersons();
@@ -112,9 +111,9 @@ public class PersonImportService implements ImportService<Person> {
   }
 
   @Nullable
-  private ImmutableList<String[]> readPersons(final File file, final ImportListener<Person> importListener) {
+  private ImmutableList<String[]> readPersons(final Resource resource, final ImportListener<Person> importListener) {
     try {
-      final Reader csvFile = new InputStreamReader(new FileInputStream(file), Charsets.ISO_8859_1);
+      final Reader csvFile = new InputStreamReader(resource.getInputStream(), Charsets.ISO_8859_1);
       final CSVReader<String[]> personReader = CSVReaderBuilder.newDefaultReader(csvFile);
       personReader.readHeader();
       final List<String[]> persons = personReader.readAll();
@@ -123,7 +122,7 @@ public class PersonImportService implements ImportService<Person> {
       }
       return ImmutableList.copyOf(persons);
     } catch (final IOException e) {
-      LOGGER.error("Can't import persons from file '{}'", file.getAbsolutePath(), e);
+      LOGGER.error("Can't import persons from '{}'", resource, e);
       return null;
     }
   }

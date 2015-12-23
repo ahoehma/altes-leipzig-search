@@ -1,7 +1,5 @@
 package com.mymita.al.importer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -12,6 +10,7 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +31,10 @@ public class MarriageImportService implements ImportService<Marriage> {
 
   @Override
   @Transactional
-  public void importData(final File file, final ImportListener<Marriage> importListener) {
-    final List<String[]> marriages = readMarriages(file, importListener);
+  public void importData(final Resource resource, final ImportListener<Marriage> importListener) {
+    final List<String[]> marriages = readMarriages(resource, importListener);
     if (marriages == null) {
-      LOGGER.warn("Nothing to import from marriages file '{}'", file.getAbsolutePath());
+      LOGGER.warn("Nothing to import marriages from '{}'", resource);
       return;
     }
     LOGGER.debug("Delete all marriages");
@@ -82,9 +81,9 @@ public class MarriageImportService implements ImportService<Marriage> {
   }
 
   @Nullable
-  private ImmutableList<String[]> readMarriages(final File file, final ImportListener<Marriage> importListener) {
+  private ImmutableList<String[]> readMarriages(final Resource resource, final ImportListener<Marriage> importListener) {
     try {
-      final Reader csvFile = new InputStreamReader(new FileInputStream(file), Charsets.ISO_8859_1);
+      final Reader csvFile = new InputStreamReader(resource.getInputStream(), Charsets.ISO_8859_1);
       final CSVReader<String[]> marriageReader = CSVReaderBuilder.newDefaultReader(csvFile);
       // PersCode1, FamName, MVorname, PersCode2, GebName, FVorname, Jahr, FamCode, PersMBeruf, PersMOrt, PersWBeruf, PersWOrt, DatHeirat,
       // Zeitraum, Kirche, Quelle
@@ -95,7 +94,7 @@ public class MarriageImportService implements ImportService<Marriage> {
       }
       return ImmutableList.copyOf(marriages);
     } catch (final IOException e) {
-      LOGGER.error("Can't import marriages from file '{}'", file.getAbsolutePath(), e);
+      LOGGER.error("Can't import marriages from '{}'", resource, e);
       return null;
     }
   }

@@ -1,0 +1,25 @@
+"PersCode";"Name";"Vorname";"GebName";"Sex";"JahrGeb";"JahrGest";"Jahre";"Bemerkung";"Quelle";"Bildquelle";"Link"
+"idA000001";"von der Aa";"Karl Wilhelm";;"m";"1876";"1937";"60";"60 Jahre, Wirtschaftsp�dagoge";;;
+"idA000002";"Abel";"Ambrosius Josef";;"m";"1820";"1878";"58";"58 Jahre, Verleger, B�rger und Buchh�ndler";;;
+"idA000003";"Abendroth";"Robert";;"m";"1842";"1917";"74";"74 Jahre, Kustos, Bibliothekar";;;
+"idA000004";"Abraham";"E. M.";"Schmidt";"w";"1839";"1915";"76";"76 Jahre, Gastwirts Witwe, Gohlis - Pariser Str. 11";"Leipziger Neueste Nachrichten v. 23.10.1915";;
+"idA000005";"Abraham";"Max";;"m";"1831";"1900";"69";"69 Jahre, Dr. jur., Verleger, Inhaber des Musikverlag C. F. Peters zu Leipzig, Talstra�e 10, Stiftung: eine Musikbibliothek und 400.000 M.";"Stadtlexikon Pro Leipzig";;
+"idA000006";"Achelis";"Hans";;"m";"1865";"1937";"71";"71 Jahre, Kirchenhistoriker";;;
+"idA000007";"Acht�lik";"Josef Hermann";;"m";"1881";"1965";"84";"84 Jahre, Komponist, Musikp�dagoge";;;
+"idA000008";"Ackermann";"Albin";;"m";"1826";"1903";"77";"77 Jahre, Verleger, Buchh�ndler und Buchdruckereibesitzer, AB - 1857: Dresdner Str. 39";;;
+"idA000009";"Ackermann";"Gustav Benedictus Alfred";;"m";"1857";;;"gest. nach 1912, Verleger";;;
+"idA000010";"Ackermann";"Heinrich Ludwig Oskar";;"m";"1836";"1913";"76";"76 Jahre, Oberhofprediger";;;
+"idA000011";"Adam";"Erich";;"m";"1915";"1966";"50";"50 Jahre, Elektromaschinenbauer";"Grabstein";"F05A068";
+"idA000012";"Adam";"Erich";;"m";"1892";"1954";"61";"61 Jahre, Elektromeister";"Grabstein";"F05A068";
+"idA000013";"Adam";"Horst";;"m";"1923";"1984";"60";"60 Jahre, Elektromaschinenbaumeister";"Grabstein";"F05A068";
+"idA000014";"Adam";"Otto Oskar Walter";;"m";"1913";"1943";"30";"30 Jahre, Gegner des NS-Regimes";;;
+"idA000015";"Adam";"Rosa";"Junge";"w";"1895";"1977";"82";"82 Jahre";"Grabstein";"F05A068";
+"idA000016";"Adler";"Abraham";;"m";"1850";"1922";"71";"71 Jahre, Handels�konom, 1873 Lehrer f�r Volkswirtschaft, Handelslehrer und kaufm�nnisches Rechnen in L., Vizedirektor an der Handelslehranstalt, Geh. Hofrat, Ritterstra�e";"Stadtlexikon Pro Leipzig";;
+"idA000017";"Adler";"Anni";"Goth";"w";"1918";"1976";"58";"58 Jahre";"Grabstein";"F13A028";
+"idA000018";"Adler";"Josef";;"m";"1914";"1994";"80";"80 Jahre";"Grabstein";"F13A028";
+"idA000019";"v. Adlershelm";"Christian Lorenz";;"m";"1608";"1684";"75";"75 Jahre, Kaufmann und B�rgermeister";"Stadtlexikon Pro Leipzig";;
+"idA000020";"Adlerstein";"Aron Alex";;"m";"1913";"2000";"86";"86 Jahre, Vorsitzender der Israelitischen Religionsgemeinde zu Leipzig, Opfer des NS-Regimes";;;
+"idA000021";"Adolphi";"Christian Michael";;"m";"1676";"1753";"77";"77 Jahre, geb. Hirschberg i./Schlesien - poln. Jelenia G�ra, Arzt";;;
+"idA000022";"A�";"Karl";;"m";"1881";"1951";"69";"69 Jahre, Pfarrer, Superintendent in Dresden-Land, Publizist";;;
+"idA000023";"Aeckerlein";"Carl Friedrich Gustav";;"m";"1878";"1965";"86";"86 Jahre, Physiker";;;
+"idA000024";"J�ger";"Julius";;"m";"1889";"1952";"62";"62 Jahre, Artist, Zirkusdirektor, K�nstlername: Cliff Aeros";;;

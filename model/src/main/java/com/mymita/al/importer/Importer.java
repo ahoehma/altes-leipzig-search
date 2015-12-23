@@ -1,18 +1,20 @@
 package com.mymita.al.importer;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.FileSystemResource;
 
 import com.mymita.al.domain.Christening;
 import com.mymita.al.domain.Marriage;
 import com.mymita.al.domain.Person;
 
 public class Importer {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Importer.class);
 
   public static void main(final String[] args) throws IOException {
     final ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("classpath:application-context.xml");
@@ -26,11 +28,9 @@ public class Importer {
     }
   }
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(Importer.class);
-
   private void importChristenings(final ClassPathXmlApplicationContext ctx) throws BeansException, IOException {
-    ctx.getBean(ChristeningImportService.class).importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/02 Taufe Abfrage.txt"),
-        new ImportListener<Christening>() {
+    ctx.getBean(ChristeningImportService.class).importData(
+        new FileSystemResource("C:/Users/Andreas Höhmann/Dropbox/Datenbank/02 Taufe Abfrage.txt"), new ImportListener<Christening>() {
 
           @Override
           public void finishedImport() {
@@ -48,8 +48,8 @@ public class Importer {
   }
 
   private void importMarriages(final ClassPathXmlApplicationContext ctx) throws BeansException, IOException {
-    ctx.getBean(MarriageImportService.class).importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/01 Heirat Abfrage.txt"),
-        new ImportListener<Marriage>() {
+    ctx.getBean(MarriageImportService.class).importData(
+        new FileSystemResource("C:/Users/Andreas Höhmann/Dropbox/Datenbank/01 Heirat Abfrage.txt"), new ImportListener<Marriage>() {
 
           @Override
           public void finishedImport() {
@@ -67,8 +67,8 @@ public class Importer {
   }
 
   private void importPersons(final ClassPathXmlApplicationContext ctx) throws BeansException, IOException {
-    ctx.getBean(PersonImportService.class).importData(new File("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt"),
-        new ImportListener<Person>() {
+    ctx.getBean(PersonImportService.class).importData(
+        new FileSystemResource("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt"), new ImportListener<Person>() {
 
           @Override
           public void finishedImport() {

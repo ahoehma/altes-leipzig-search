@@ -1,7 +1,5 @@
 package com.mymita.al.importer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -12,6 +10,7 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,8 @@ public class ChristeningImportService implements ImportService<Christening> {
   @Autowired
   transient ChristeningRepository christeningRepository;
 
-  private void importChristening(final int i, final int max, final Christening christening, final ImportListener<Christening> importListener) {
+  private void importChristening(final int i, final int max, final Christening christening,
+      final ImportListener<Christening> importListener) {
     christeningRepository.save(christening);
     if (importListener != null) {
       importListener.progressImport(christening, i, max);
@@ -52,19 +52,20 @@ public class ChristeningImportService implements ImportService<Christening> {
       final String vaterVName = data[7];
       final String taetigkeit = data[8];
       final String quelle = data[9];
-      importChristening(i, max, new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode)
-          .personCode2(kPersCode).personCode2(mPersCode).reference(quelle).profession(taetigkeit).firstNameFather(vaterVName)
-          .lastNameFather(vaterName), importListener);
+      importChristening(i, max,
+          new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode).personCode2(kPersCode)
+              .personCode2(mPersCode).reference(quelle).profession(taetigkeit).firstNameFather(vaterVName).lastNameFather(vaterName),
+          importListener);
       i++;
     }
   }
 
   @Override
   @Transactional
-  public void importData(final File file, final ImportListener<Christening> importListener) {
-    final List<String[]> christenings = readChristenings(file, importListener);
+  public void importData(final Resource resource, final ImportListener<Christening> importListener) {
+    final List<String[]> christenings = readChristenings(resource, importListener);
     if (christenings == null) {
-      LOGGER.warn("Nothing to import from christenings file '{}'", file.getAbsolutePath());
+      LOGGER.warn("Nothing to import christenings from '{}'", resource);
       return;
     }
     LOGGER.debug("Delete all christenings");
@@ -75,9 +76,9 @@ public class ChristeningImportService implements ImportService<Christening> {
   }
 
   @Nullable
-  private ImmutableList<String[]> readChristenings(final File file, final ImportListener<Christening> importListener) {
+  private ImmutableList<String[]> readChristenings(final Resource resource, final ImportListener<Christening> importListener) {
     try {
-      final Reader csvFile = new InputStreamReader(new FileInputStream(file), Charsets.ISO_8859_1);
+      final Reader csvFile = new InputStreamReader(resource.getInputStream(), Charsets.ISO_8859_1);
       final CSVReader<String[]> christeningReader = CSVReaderBuilder.newDefaultReader(csvFile);
       // PersCode1, FamName, MVorname, PersCode2, GebName, FVorname, Jahr, FamCode, PersMBeruf, PersMOrt, PersWBeruf, PersWOrt, DatHeirat,
       // Zeitraum, Kirche, Quelle
@@ -88,7 +89,7 @@ public class ChristeningImportService implements ImportService<Christening> {
       }
       return ImmutableList.copyOf(christenings);
     } catch (final IOException e) {
-      LOGGER.error("Can't import christenings from file '{}'", file.getAbsolutePath(), e);
+      LOGGER.error("Can't import christenings from '{}'", resource, e);
       return null;
     }
   }
