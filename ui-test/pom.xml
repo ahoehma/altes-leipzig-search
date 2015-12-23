@@ -10,10 +10,6 @@
   </parent>
   <artifactId>ui-test</artifactId>
   <name>ui-test</name>
-  <url>http://maven.apache.org</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.testng</groupId>
