@@ -10,6 +10,7 @@ public class AppTest {
 
   @Test
   public void canClick() {
+    // System.setProperty("remote", "http://" + ahoehma + ":" + authentication.getAccessKey() + "@ondemand.saucelabs.com:80/wd/hub");
     Selenide.open("http://localhost:8080/main/person");
     $("div[location=\"name\"] input").val("Wagner").pressEnter();
   }
