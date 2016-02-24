@@ -234,7 +234,6 @@
           <target>${compiler.target.version}</target>
           <compilerVersion>${compiler.target.version}</compilerVersion>
           <encoding>${project.build.sourceEncoding}</encoding>
-          <compilerArgument>-parameters</compilerArgument>
         </configuration>
       </plugin>
     </plugins>
