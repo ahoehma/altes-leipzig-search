@@ -11,18 +11,22 @@
   <artifactId>ui-vaadin</artifactId>
   <packaging>war</packaging>
   <properties>
-    <org.springframework.security.version>4.0.0.M2</org.springframework.security.version>
-    <vaadin.version>7.3.3</vaadin.version>
+    <spring-security.version>4.0.3.RELEASE</spring-security.version>
+    <vaadin.version>7.6.1</vaadin.version>
+    <vaadin.pagedtable.version>0.6.5</vaadin.pagedtable.version>
+    <vaadin.confirmdialog.version>2.1.2</vaadin.confirmdialog.version>
+    <h2.version>1.4.191</h2.version>
+    <jetty.version>9.2.14.v20151106</jetty.version>
+    <jetty.spdy.version>9.2.14.v20151106</jetty.spdy.version>
     <jetty.port>8080</jetty.port>
     <jetty.secure.port>8443</jetty.secure.port>
-    <jetty.version>9.2.3.v20140905</jetty.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-web</artifactId>
-        <version>${org.springframework.security.version}</version>
+        <version>${spring-security.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -33,7 +37,7 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-config</artifactId>
-        <version>${org.springframework.security.version}</version>
+        <version>${spring-security.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -70,11 +74,13 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>com.vaadin.external.google</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-push</artifactId>
+      <version>${vaadin.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
@@ -87,15 +93,14 @@
       <version>${vaadin.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-push</artifactId>
-      <version>${vaadin.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.vaadin.addons</groupId>
       <artifactId>pagedtable</artifactId>
-      <version>0.6.5</version>
+      <version>${vaadin.pagedtable.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.vaadin.addon</groupId>
+      <artifactId>confirmdialog</artifactId>
+      <version>${vaadin.confirmdialog.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -113,7 +118,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.181</version>
+      <version>${h2.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -126,6 +131,10 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>aspectj-maven-plugin</artifactId>
         <configuration>
@@ -136,26 +145,6 @@
             </aspectLibrary>
           </aspectLibraries>
         </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>test-compile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjrt</artifactId>
-            <version>${aspectj.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjtools</artifactId>
-            <version>${aspectj.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
       <plugin>
         <groupId>com.vaadin</groupId>
@@ -180,7 +169,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.5</version>
+        <version>2.6</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
@@ -222,7 +211,7 @@
           <dependency>
             <groupId>org.eclipse.jetty.spdy</groupId>
             <artifactId>spdy-http-server</artifactId>
-            <version>${jetty.version}</version>
+            <version>${jetty.spdy.version}</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -237,7 +226,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>keytool-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.5</version>
         <executions>
           <execution>
             <phase>generate-resources</phase>
@@ -248,9 +237,9 @@
           </execution>
           <execution>
             <phase>generate-resources</phase>
-            <id>genkey</id>
+            <id>generateKeyPair</id>
             <goals>
-              <goal>genkey</goal>
+              <goal>generateKeyPair</goal>
             </goals>
           </execution>
         </executions>
@@ -261,18 +250,6 @@
           <storepass>123geheim</storepass>
           <alias>jetty-ws</alias>
           <keyalg>RSA</keyalg>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.jelastic</groupId>
-        <artifactId>jelastic-maven-plugin</artifactId>
-        <version>1.7-SNAPSHOT</version>
-        <configuration>
-          <email>${jelastic.login}</email>
-          <password>${jelastic.password}</password>
-          <context>altes-leipzig-ui-vaadin</context>
-          <environment>mymita</environment>
-          <api_hoster>app.jelastic.dogado.eu</api_hoster>
         </configuration>
       </plugin>
     </plugins>
@@ -292,7 +269,7 @@
                     <versionRange>[1.1,)</versionRange>
                     <goals>
                       <goal>clean</goal>
-                      <goal>genkey</goal>
+                      <goal>generateKeyPair</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>

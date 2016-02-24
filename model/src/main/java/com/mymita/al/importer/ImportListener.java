@@ -4,7 +4,7 @@ public interface ImportListener<T> {
 
   void finishedImport();
 
-  void progressImport(final T object);
+  void progressImport(final T object, final int i, final int max);
 
-  void startImport(final Class<? extends Object> clazz, final int size);
+  void startImport(final int max);
 }

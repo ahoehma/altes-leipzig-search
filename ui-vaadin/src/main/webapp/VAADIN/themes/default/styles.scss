@@ -1,0 +1,67 @@
+/**
+ * Theme
+ */
+ 
+@import url(css/foundation-icons.css);
+
+$v-app-loading-text: "Lade Altes Leipzig Daten ...";
+$v-app-background-color: #EEEEEE;
+$v-font-size: 13px;
+$v-font-color: #6E6A67;
+$v-font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+$v-focus-style: 0 0 0 0.5px #000000;
+$v-focus-color: #000000;
+$v-included-components:
+    verticallayout,
+    horizontallayout,
+    gridlayout,
+    textfield,
+    table,
+    panel,
+    button;
+
+@import "../valo/valo";
+
+@mixin margin($top, $right, $bottom, $left) {
+  padding-top : $top;
+  padding-right : $right;
+  padding-bottom : $bottom;
+  padding-left : $left;
+}
+
+.default {
+
+
+  @include valo;
+  
+  .v-caption { 
+    display: block;
+  }
+  
+  .v-table-header-wrap {
+    background-color: black;
+    background-image: none;
+    color: white;
+  }
+  
+  .v-panel-caption.v-panel-caption-borderless {
+    margin: 0px 2px !important;
+  }
+  
+  .v-panel-content.v-panel-content-borderless {
+    background-color: #FFFFFF;
+    margin: 0px 2px !important;
+  }
+  
+  .v-panel-image .v-panel-content.v-panel-content-borderless {
+    background-color: $v-app-background-color;
+  }
+  
+  .v-horizontallayout-help {
+    @include margin(5px,0px,5px,0px);
+  }
+  
+  .email-contact {
+    cursor: pointer;
+  }
+}

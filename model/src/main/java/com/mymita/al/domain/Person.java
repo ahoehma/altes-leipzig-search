@@ -38,4 +38,6 @@ public class Person {
   private final String yearsOfLife;
   private final String description;
   private final String reference;
+  private final String link;
+  private final String image;
 }

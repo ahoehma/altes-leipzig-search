@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -18,14 +18,12 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.Reindeer;
+import com.vaadin.ui.themes.ValoTheme;
 
 public abstract class AbstractSearch<T> extends UI {
 
-  private static final long serialVersionUID = -2765748679653124722L;
-
   protected static String name(final String value) {
-    final String result = Objects.firstNonNull(value, "").replaceAll("'", "").replaceAll("%", "");
+    final String result = MoreObjects.firstNonNull(value, "").replaceAll("'", "").replaceAll("%", "");
     if (result.length() < 3) {
       return null;
     }
@@ -55,6 +53,8 @@ public abstract class AbstractSearch<T> extends UI {
 
   protected Table createResultTable() {
     final Table resultTable = new Table();
+    resultTable.setStyleName(ValoTheme.TABLE_BORDERLESS);
+    resultTable.addStyleName(ValoTheme.TABLE_COMPACT);
     resultTable.setContainerDataSource(new BeanItemContainer<T>(entityClass));
     return resultTable;
   }
@@ -64,6 +64,9 @@ public abstract class AbstractSearch<T> extends UI {
     getPage().setTitle("Altes Leipzig Suche");
     try {
       content = new CustomLayout(classPathResource.getInputStream());
+      content.setSizeFull();
+      content.setWidth(700, Unit.PIXELS);
+      // content.setHeight(100, Unit.PERCENTAGE);
     } catch (final IOException e) {
       return;
     }
@@ -72,21 +75,21 @@ public abstract class AbstractSearch<T> extends UI {
     initContent(content, resultTable);
     showResultDetails(content, resultTable, null);
     setContent(content);
+    setSizeFull();
   }
 
   protected abstract void initContent(final CustomLayout content, final Table resultTable);
 
   private Table initResultTable() {
     final Table results = createResultTable();
-    results.setStyleName(Reindeer.TABLE_BORDERLESS);
-    results.addStyleName(Reindeer.TABLE_STRONG);
     results.setWidth(100, Unit.PERCENTAGE);
     results.setHeight(350, Unit.PIXELS);
     results.setSelectable(true);
     results.setMultiSelect(false);
     results.setImmediate(true);
-    results.setPageLength(15);
+    results.setPageLength(50);
     results.addValueChangeListener(new ValueChangeListener() {
+      @SuppressWarnings("unchecked")
       @Override
       public void valueChange(final ValueChangeEvent event) {
         showResultDetails(content, resultTable, (T) event.getProperty().getValue());

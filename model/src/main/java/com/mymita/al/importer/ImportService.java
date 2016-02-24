@@ -1,8 +1,8 @@
 package com.mymita.al.importer;
 
-import java.io.File;
+import org.springframework.core.io.Resource;
 
 public interface ImportService<T> {
 
-  void importData(final File file, final ImportListener<T> importListener);
+  void importData(final Resource resource, final ImportListener<T> importListener);
 }
