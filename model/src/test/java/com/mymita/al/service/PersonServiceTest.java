@@ -36,10 +36,10 @@ public class PersonServiceTest extends AbstractTransactionalTestNGSpringContextT
   @BeforeTransaction
   public void setupData() throws Exception {
     deleteFromTables("person");
-    personRepository.save(new Person().firstName("Andreas").lastName("Höhmann").birthName("Höhmann").gender(Gender.MALE).personCode("0001")
-        .yearOfBirth("1976"));
-    personRepository.save(new Person().firstName("Albert").lastName("Einstein").birthName("Einstein").gender(Gender.MALE)
-        .personCode("0002").yearOfBirth("1879").yearOfDeath("1955"));
+    personRepository.save(Person.builder().firstName("Andreas").lastName("Höhmann").birthName("Höhmann").gender(Gender.MALE)
+        .personCode("0001").yearOfBirth("1976").build());
+    personRepository.save(Person.builder().firstName("Albert").lastName("Einstein").birthName("Einstein").gender(Gender.MALE)
+        .personCode("0002").yearOfBirth("1879").yearOfDeath("1955").build());
     assertThat(personRepository.count(), Matchers.is(2L));
     assertThat(Iterables.getFirst(personRepository.findAll(), null).getLastName(), is("Höhmann"));
   }

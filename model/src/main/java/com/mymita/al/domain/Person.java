@@ -7,13 +7,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import lombok.Data;
-import lombok.experimental.Builder;
-
-@Builder
-@Data
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(name = "unique_person_code", columnNames = { "personCode" }) })
+@lombok.Builder
+@lombok.Data
 public class Person {
 
   public enum Gender {
