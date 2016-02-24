@@ -7,27 +7,35 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-@Entity
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+
 @Table(uniqueConstraints = { @UniqueConstraint(name = "unique_person_code", columnNames = { "personCode" }) })
-@lombok.Builder
-@lombok.Data
+@Entity
+@Getter
+@ToString
+@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+@Builder
 public class Person {
 
   public enum Gender {
     MALE, FEMALE
   }
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-  private String personCode;
-  private String firstName;
-  private String lastName;
-  private String birthName;
-  private Gender gender;
-  private String yearOfBirth;
-  private String yearOfDeath;
-  private String yearsOfLife;
-  private String description;
-  private String reference;
+  private @Id @GeneratedValue(strategy = GenerationType.AUTO) final Long id;
+  private final String personCode;
+  private final String firstName;
+  private final String lastName;
+  private final String birthName;
+  private final Gender gender;
+  private final String yearOfBirth;
+  private final String yearOfDeath;
+  private final String yearsOfLife;
+  private final String description;
+  private final String reference;
 }

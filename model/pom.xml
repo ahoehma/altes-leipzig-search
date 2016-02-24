@@ -101,18 +101,18 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>aspectj-maven-plugin</artifactId>
-        <configuration>
-          <aspectLibraries>
-            <aspectLibrary>
-              <groupId>org.springframework</groupId>
-              <artifactId>spring-aspects</artifactId>
-            </aspectLibrary>
-          </aspectLibraries>
-        </configuration>
-      </plugin>
+      <!-- <plugin> -->
+      <!-- <groupId>org.codehaus.mojo</groupId> -->
+      <!-- <artifactId>aspectj-maven-plugin</artifactId> -->
+      <!-- <configuration> -->
+      <!-- <aspectLibraries> -->
+      <!-- <aspectLibrary> -->
+      <!-- <groupId>org.springframework</groupId> -->
+      <!-- <artifactId>spring-aspects</artifactId> -->
+      <!-- </aspectLibrary> -->
+      <!-- </aspectLibraries> -->
+      <!-- </configuration> -->
+      <!-- </plugin> -->
       <plugin>
         <groupId>com.mysema.maven</groupId>
         <artifactId>apt-maven-plugin</artifactId>

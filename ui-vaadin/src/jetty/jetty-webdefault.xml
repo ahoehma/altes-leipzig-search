@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<web-app
-   xmlns="http://java.sun.com/xml/ns/javaee"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-   version="3.0">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns="http://java.sun.com/xml/ns/javaee" 
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0">
 
   <description>
     Default web.xml file.
     This file is applied to a Web application before it's own WEB_INF/web.xml file
   </description>
-
+ 
   <!-- ==================================================================== -->
   <!-- The default servlet.                                                 -->
   <!-- This servlet, normally mapped to /, provides the handling for static -->
@@ -57,15 +56,15 @@
       <param-value>260000</param-value>
     </init-param>
     <init-param>
-      <param-name>maxCachedFiles</param-name>
+      <param-name>maxCachedFiles</param-name> 
       <param-value>100</param-value>
     </init-param>
-    <load-on-startup>0</load-on-startup>
     <!-- XXX avoid static-ressources-locking (http://appfuse.org/display/APF/FAQ#FAQ-jettyrunlocked) -->
     <init-param>
       <param-name>useFileMappedBuffer</param-name>
       <param-value>false</param-value>
     </init-param>
+    <load-on-startup>0</load-on-startup>
   </servlet>
   <servlet-mapping> <servlet-name>default</servlet-name> <url-pattern>/</url-pattern> </servlet-mapping>
 
