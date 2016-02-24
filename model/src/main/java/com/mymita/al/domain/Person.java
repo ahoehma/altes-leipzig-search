@@ -158,8 +158,8 @@ public class Person {
   public String toString() {
     return String.format(
         "Person [id=%s, personCode=%s, firstName=%s, lastName=%s, birthName=%s, gender=%s, yearOfBirth=%s, yearOfDeath=%s, "
-            + "yearsOfLife=%s, description=%s, reference=%s, link=%s, image=%s]", id, personCode, firstName, lastName, birthName, gender,
-            yearOfBirth, yearOfDeath, yearsOfLife, description, reference, link, image);
+            + "yearsOfLife=%s, description=%s, reference=%s, link=%s, image=%s]",
+        id, personCode, firstName, lastName, birthName, gender, yearOfBirth, yearOfDeath, yearsOfLife, description, reference, link, image);
   }
 
   public Person yearOfBirth(final String yearOfBirth) {
