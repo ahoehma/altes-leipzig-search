@@ -33,7 +33,7 @@
   </pluginRepositories>
   <properties>
     <spring.version>4.2.4.RELEASE</spring.version>
-    <spring-data-jpa.version>1.9.2.RELEASE</spring-data-jpa.version>
+    <spring-data-jpa.version>1.11.20.RELEASE</spring-data-jpa.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <compiler.source.version>1.7</compiler.source.version>
     <compiler.target.version>1.7</compiler.target.version>
