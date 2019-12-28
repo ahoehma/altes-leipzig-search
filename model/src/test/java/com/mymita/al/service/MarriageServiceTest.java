@@ -14,7 +14,7 @@ import com.google.common.collect.Iterables;
 import com.mymita.al.domain.Marriage;
 import com.mymita.al.repository.MarriageRepository;
 
-@ContextConfiguration(locations = { "classpath:/META-INF/spring/context-test.xml" })
+@ContextConfiguration(locations = {"classpath:/META-INF/spring/context-test.xml"})
 public class MarriageServiceTest extends AbstractTransactionalTestNGSpringContextTests {
 
   @Autowired
@@ -37,9 +37,9 @@ public class MarriageServiceTest extends AbstractTransactionalTestNGSpringContex
   @BeforeTransaction
   public void setupData() throws Exception {
     deleteFromTables("marriage");
-    marriageRepository.save(new Marriage().firstNamePerson1("Andreas").lastNamePerson1("Höhmann").firstNamePerson2("Kathrin")
+    marriageRepository.save(Marriage.builder().firstNamePerson1("Andreas").lastNamePerson1("Höhmann").firstNamePerson2("Kathrin")
         .birthNamePerson2("Krug").cityPerson1("Altenburg").cityPerson2("Zwickau").familyCode("f001").personCode1("0001")
-        .personCode2("0002").year("2010").dateMarriage("20.10.2010"));
+        .personCode2("0002").year("2010").dateMarriage("20.10.2010").build());
     assertThat(marriageRepository.count(), Matchers.is(1L));
     assertThat(Iterables.getFirst(marriageRepository.findAll(), null).getLastNamePerson1(), is("Höhmann"));
   }

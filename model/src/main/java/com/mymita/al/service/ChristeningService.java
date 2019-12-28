@@ -12,24 +12,22 @@ import com.mymita.al.domain.Christening;
 import com.mymita.al.domain.QChristening;
 import com.mymita.al.repository.ChristeningRepository;
 import com.mymita.al.util.BooleanExpressions;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 @Service
 public class ChristeningService {
-
-  private static final QChristening $ = QChristening.christening;
 
   @Autowired
   transient ChristeningRepository repository;
 
   @Transactional(readOnly = true)
-  public Iterable<Christening> find(final String aName, final String aYear) {
+  public Iterable<Christening> find(final String name, final String year) {
     final List<BooleanExpression> predicates = Lists.newArrayList();
-    if (!Strings.isNullOrEmpty(aName)) {
-      predicates.add($.lastNameFather.containsIgnoreCase(aName));
+    if (!Strings.isNullOrEmpty(name)) {
+      predicates.add(QChristening.christening.lastNameFather.containsIgnoreCase(name));
     }
-    if (!Strings.isNullOrEmpty(aYear)) {
-      predicates.add($.year.eq(aYear));
+    if (!Strings.isNullOrEmpty(year)) {
+      predicates.add(QChristening.christening.year.eq(year));
     }
     if (predicates.isEmpty()) {
       return Lists.<Christening> newArrayList();

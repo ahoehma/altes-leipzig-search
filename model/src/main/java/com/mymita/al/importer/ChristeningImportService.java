@@ -53,8 +53,19 @@ public class ChristeningImportService implements ImportService<Christening> {
       final String taetigkeit = data[8];
       final String quelle = data[9];
       importChristening(i, max,
-          new Christening().personCode1(kPersCode).taufKind(taufKind).year(jahr).church(kirche).familyCode(famCode).personCode2(kPersCode)
-              .personCode2(mPersCode).reference(quelle).profession(taetigkeit).firstNameFather(vaterVName).lastNameFather(vaterName),
+          Christening.builder()
+              .personCode1(kPersCode)
+              .taufKind(taufKind)
+              .year(jahr)
+              .church(kirche)
+              .familyCode(famCode)
+              .personCode2(kPersCode)
+              .personCode2(mPersCode)
+              .reference(quelle)
+              .profession(taetigkeit)
+              .firstNameFather(vaterVName)
+              .lastNameFather(vaterName)
+              .build(),
           importListener);
       i++;
     }

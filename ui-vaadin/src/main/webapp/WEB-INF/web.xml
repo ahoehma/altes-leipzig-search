@@ -81,17 +81,4 @@
     <url-pattern>/search/christening/*</url-pattern>
   </servlet-mapping>
 
-<!--   <servlet> -->
-<!--     <servlet-name>Admin</servlet-name> -->
-<!--     <servlet-class>com.vaadin.server.VaadinServlet</servlet-class> -->
-<!--     <init-param> -->
-<!--       <param-name>UI</param-name> -->
-<!--       <param-value>com.mymita.al.ui.admin.AdminUI</param-value> -->
-<!--     </init-param> -->
-<!--   </servlet> -->
-<!--   <servlet-mapping> -->
-<!--     <servlet-name>Admin</servlet-name> -->
-<!--     <url-pattern>/admin/*</url-pattern> -->
-<!--   </servlet-mapping> -->
-
 </web-app>

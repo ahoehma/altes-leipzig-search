@@ -33,7 +33,7 @@ public class Importer {
         new FileSystemResource("C:/Users/Andreas Höhmann/Dropbox/Datenbank/02 Taufe Abfrage.txt"), new ImportListener<Christening>() {
 
           @Override
-          public void finishedImport() {
+          public void finishedImport(final int count) {
           }
 
           @Override
@@ -52,7 +52,7 @@ public class Importer {
         new FileSystemResource("C:/Users/Andreas Höhmann/Dropbox/Datenbank/01 Heirat Abfrage.txt"), new ImportListener<Marriage>() {
 
           @Override
-          public void finishedImport() {
+          public void finishedImport(final int count) {
           }
 
           @Override
@@ -71,7 +71,7 @@ public class Importer {
         new FileSystemResource("C:/Users/Andreas Höhmann/Dropbox/Datenbank/00 Personen Abfrage.txt"), new ImportListener<Person>() {
 
           @Override
-          public void finishedImport() {
+          public void finishedImport(final int count) {
           }
 
           @Override

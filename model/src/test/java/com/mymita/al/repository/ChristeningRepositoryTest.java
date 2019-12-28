@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 import com.google.common.collect.Iterables;
 import com.mymita.al.domain.Christening;
 
-@ContextConfiguration(locations = { "classpath:/META-INF/spring/context-test.xml" })
+@ContextConfiguration(locations = {"classpath:/META-INF/spring/context-test.xml"})
 public class ChristeningRepositoryTest extends AbstractTransactionalTestNGSpringContextTests {
 
   @Autowired
@@ -35,7 +35,8 @@ public class ChristeningRepositoryTest extends AbstractTransactionalTestNGSpring
   @BeforeTransaction
   public void setupData() throws Exception {
     deleteFromTables("christening");
-    repository.save(new Christening().lastNameFather("Höhmann").familyCode("f001").personCode1("0001").personCode2("0002").year("2010"));
+    repository.save(
+        Christening.builder().lastNameFather("Höhmann").familyCode("f001").personCode1("0001").personCode2("0002").year("2010").build());
     assertThat(repository.count(), Matchers.is(1L));
     assertThat(Iterables.getFirst(repository.findAll(), null).getLastNameFather(), is("Höhmann"));
   }

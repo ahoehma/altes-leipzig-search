@@ -8,36 +8,39 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
-@Table(uniqueConstraints = { @UniqueConstraint(name = "unique_person_code", columnNames = { "personCode" }) })
+@Table(uniqueConstraints = {@UniqueConstraint(name = "unique_person_code", columnNames = {"personCode"})})
 @Entity
+@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Setter(value = AccessLevel.PUBLIC)
 @Getter
-@ToString
-@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
-@RequiredArgsConstructor
-@Builder
 public class Person {
 
   public enum Gender {
     MALE, FEMALE
   }
 
-  private @Id @GeneratedValue(strategy = GenerationType.AUTO) final Long id;
-  private final String personCode;
-  private final String firstName;
-  private final String lastName;
-  private final String birthName;
-  private final Gender gender;
-  private final String yearOfBirth;
-  private final String yearOfDeath;
-  private final String yearsOfLife;
-  private final String description;
-  private final String reference;
-  private final String link;
-  private final String image;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  private Long id;
+
+  private String personCode;
+  private String firstName;
+  private String lastName;
+  private String birthName;
+  private Gender gender;
+  private String yearOfBirth;
+  private String yearOfDeath;
+  private String yearsOfLife;
+  private String description;
+  private String reference;
+  private String link;
+  private String image;
 }

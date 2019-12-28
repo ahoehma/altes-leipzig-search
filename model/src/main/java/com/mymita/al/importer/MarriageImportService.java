@@ -71,10 +71,24 @@ public class MarriageImportService implements ImportService<Marriage> {
       final String zeitraum = data[13];
       final String kirche = data[14];
       final String quelle = data[15];
-      final Marriage newMarriage = new Marriage().familyCode(famCode).personCode1(persCode1).personCode2(persCode2).dateMarriage(datHeirat)
-          .church(kirche).reference(quelle).periodMarriage(zeitraum).year(jahr).professionPerson1(persMBeruf).professionPerson2(persWBeruf)
-          .cityPerson1(persMOrt).cityPerson2(persWOrt).lastNamePerson1(famName).birthNamePerson2(gebName).firstNamePerson1(mVorname)
-          .firstNamePerson2(fVorname);
+      final Marriage newMarriage = Marriage.builder()
+          .familyCode(famCode)
+          .personCode1(persCode1)
+          .personCode2(persCode2)
+          .dateMarriage(datHeirat)
+          .church(kirche)
+          .reference(quelle)
+          .periodMarriage(zeitraum)
+          .year(jahr)
+          .professionPerson1(persMBeruf)
+          .professionPerson2(persWBeruf)
+          .cityPerson1(persMOrt)
+          .cityPerson2(persWOrt)
+          .lastNamePerson1(famName)
+          .birthNamePerson2(gebName)
+          .firstNamePerson1(mVorname)
+          .firstNamePerson2(fVorname)
+          .build();
       importMarriage(i, max, newMarriage, importListener);
       i++;
     }

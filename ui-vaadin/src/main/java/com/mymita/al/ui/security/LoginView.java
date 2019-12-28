@@ -1,5 +1,7 @@
 package com.mymita.al.ui.security;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -8,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.google.common.base.Objects;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.Button;
@@ -35,7 +36,7 @@ public class LoginView extends FormLayout implements View {
     button.addClickListener(new ClickListener() {
       @Override
       public void buttonClick(final ClickEvent clickEvent) {
-        authenticate(Objects.firstNonNull(loginField.getValue(), ""), Objects.firstNonNull(passwordField.getValue(), ""));
+        authenticate(firstNonNull(loginField.getValue(), ""), firstNonNull(passwordField.getValue(), ""));
         loginField.setValue("");
         passwordField.setValue("");
       }

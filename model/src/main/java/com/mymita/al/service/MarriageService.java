@@ -1,5 +1,7 @@
 package com.mymita.al.service;
 
+import static com.mymita.al.util.BooleanExpressions.or;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,24 +14,23 @@ import com.mymita.al.domain.Marriage;
 import com.mymita.al.domain.QMarriage;
 import com.mymita.al.repository.MarriageRepository;
 import com.mymita.al.util.BooleanExpressions;
-import com.mysema.query.types.expr.BooleanExpression;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 @Service
 public class MarriageService {
-
-  private static final QMarriage $ = QMarriage.marriage;
 
   @Autowired
   transient MarriageRepository marriageRepository;
 
   @Transactional(readOnly = true)
-  public Iterable<Marriage> find(final String aName, final String aYear) {
+  public Iterable<Marriage> find(final String name, final String year) {
     final List<BooleanExpression> predicates = Lists.newArrayList();
-    if (!Strings.isNullOrEmpty(aName)) {
-      predicates.add(BooleanExpressions.or($.lastNamePerson1.containsIgnoreCase(aName), $.birthNamePerson2.containsIgnoreCase(aName)));
+    if (!Strings.isNullOrEmpty(name)) {
+      predicates.add(
+          or(QMarriage.marriage.lastNamePerson1.containsIgnoreCase(name), QMarriage.marriage.birthNamePerson2.containsIgnoreCase(name)));
     }
-    if (!Strings.isNullOrEmpty(aYear)) {
-      predicates.add($.year.eq(aYear));
+    if (!Strings.isNullOrEmpty(year)) {
+      predicates.add(QMarriage.marriage.year.eq(year));
     }
     if (predicates.isEmpty()) {
       return Lists.<Marriage> newArrayList();

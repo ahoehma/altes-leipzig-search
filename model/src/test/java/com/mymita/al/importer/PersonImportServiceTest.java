@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
 import com.mymita.al.domain.Person;
 import com.mymita.al.repository.PersonRepository;
 
-@ContextConfiguration(locations = { "classpath:/META-INF/spring/context-test.xml" })
+@ContextConfiguration(locations = {"classpath:/META-INF/spring/context-test.xml"})
 public class PersonImportServiceTest extends AbstractTransactionalTestNGSpringContextTests {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PersonImportServiceTest.class);
@@ -31,7 +31,7 @@ public class PersonImportServiceTest extends AbstractTransactionalTestNGSpringCo
         new ImportListener<Person>() {
 
           @Override
-          public void finishedImport() {
+          public void finishedImport(final int count) {
           }
 
           @Override
