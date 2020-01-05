@@ -1,6 +1,8 @@
 package com.mymita.al.importer;
 
 import static com.googlecode.jcsv.reader.internal.CSVReaderBuilder.newDefaultReader;
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -14,12 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.googlecode.jcsv.reader.CSVReader;
@@ -45,9 +43,20 @@ public class PersonImportService implements ImportService<Person> {
     final String reference = data[9];
     final String image = data[10];
     final String link = data[11];
-    return Person.builder().personCode(code).lastName(lastName).firstName(firstName).birthName(birthName).gender(gender)
-        .yearOfBirth(yearOfBirth).yearOfDeath(yearOfDeath).yearsOfLife(yearsOfLife).description(description).reference(reference)
-        .link(link).image(image).build();
+    return Person.builder()
+        .personCode(code)
+        .lastName(lastName)
+        .firstName(firstName)
+        .birthName(birthName)
+        .gender(gender)
+        .yearOfBirth(yearOfBirth)
+        .yearOfDeath(yearOfDeath)
+        .yearsOfLife(yearsOfLife)
+        .description(description)
+        .reference(reference)
+        .link(link)
+        .image(image)
+        .build();
   };
 
   @Nullable
@@ -65,59 +74,49 @@ public class PersonImportService implements ImportService<Person> {
   }
 
   @Autowired
-  transient PersonRepository personRepository;
+  private PersonRepository personRepository;
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deletePersons() {
-    LOGGER.debug("Delete all persons");
-    personRepository.deleteAll();
-    LOGGER.debug("Deleted all persons");
-  }
-
-  @Async
   @Override
   public void importData(final Resource resource, final ImportListener<Person> importListener) {
-    final List<String[]> persons = readPersons(resource, importListener);
+    final List<String[]> persons = readPersons(resource);
     if (persons == null) {
       LOGGER.warn("Nothing to import persons from '{}'", resource);
       return;
     }
-    deletePersons();
     importPersons(persons, importListener);
     LOGGER.debug("Added '{}' persons successfully", persons.size());
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void importPersons(final List<String[]> persons, final ImportListener<Person> importListener) {
+  void importPersons(final List<String[]> persons, final ImportListener<Person> importListener) {
+    LOGGER.debug("Before import lets delete all persons first");
+    importListener.startDelete(personRepository.count());
+    personRepository.deleteAllInBatch();
+    importListener.finishedDelete();
+    LOGGER.debug("Before import deleted all persons");
     final int max = persons.size();
+    importListener.startImport(max);
     int i = 1;
     final int chunkSize = 5000;
     LOGGER.debug("Start adding given '{}' persons in chunks with '{}' persons", max, chunkSize);
     for (final List<String[]> data : Lists.partition(persons, chunkSize)) {
       try {
         final Iterable<Person> importedPersons = personRepository.saveAll(data.stream().map(TO_PERSON).collect(toList()));
-        if (importListener != null) {
-          for (final Person importedPerson : importedPersons) {
-            importListener.progressImport(importedPerson, i, max);
-            i++;
-          }
+        for (final Person importedPerson : importedPersons) {
+          importListener.progressImport(importedPerson, i, max);
+          i++;
         }
       } catch (final org.springframework.dao.DataIntegrityViolationException e) {
-        throw new org.springframework.dao.DataIntegrityViolationException(String.format("Can't import persons '%s'", data), e);
+        throw new org.springframework.dao.DataIntegrityViolationException(format("Can't import persons '%s'", data), e);
       }
     }
-    importListener.finishedImport(i);
+    importListener.finishedImport(i - 1);
   }
 
   @Nullable
-  private ImmutableList<String[]> readPersons(final Resource resource, final ImportListener<Person> importListener) {
-    try (final CSVReader<String[]> personReader = newDefaultReader(new InputStreamReader(resource.getInputStream(), Charsets.ISO_8859_1))) {
+  private ImmutableList<String[]> readPersons(final Resource resource) {
+    try (final CSVReader<String[]> personReader = newDefaultReader(new InputStreamReader(resource.getInputStream(), ISO_8859_1))) {
       personReader.readHeader();
-      final List<String[]> persons = personReader.readAll();
-      if (importListener != null) {
-        importListener.startImport(persons.size());
-      }
-      return ImmutableList.copyOf(persons);
+      return ImmutableList.copyOf(personReader.readAll());
     } catch (final IOException e) {
       LOGGER.error("Can't import persons from '{}'", resource, e);
       return null;

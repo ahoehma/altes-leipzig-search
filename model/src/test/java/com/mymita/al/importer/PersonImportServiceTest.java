@@ -31,7 +31,7 @@ public class PersonImportServiceTest extends AbstractTransactionalTestNGSpringCo
         new ImportListener<Person>() {
 
           @Override
-          public void finishedImport(final int count) {
+          public void startImport(final int max) {
           }
 
           @Override
@@ -40,7 +40,15 @@ public class PersonImportServiceTest extends AbstractTransactionalTestNGSpringCo
           }
 
           @Override
-          public void startImport(final int max) {
+          public void finishedImport(final int count) {
+          }
+
+          @Override
+          public void startDelete(final long count) {
+          }
+
+          @Override
+          public void finishedDelete() {
           }
         });
     assertThat(personRepository.count(), Matchers.is(24L));

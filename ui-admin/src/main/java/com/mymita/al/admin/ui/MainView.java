@@ -45,8 +45,7 @@ public class MainView extends AppLayout {
     return tabs.toArray(new Tab[tabs.size()]);
   }
 
-  private static Tab createTab(final String title,
-      final Class<? extends Component> viewClass) {
+  private static Tab createTab(final String title, final Class<? extends Component> viewClass) {
     return createTab(populateLink(new RouterLink(null, viewClass), title));
   }
 
@@ -69,12 +68,10 @@ public class MainView extends AppLayout {
   }
 
   private void selectTab() {
-    final String target = RouteConfiguration.forSessionScope()
-        .getUrl(getContent().getClass());
+    final String target = RouteConfiguration.forSessionScope().getUrl(getContent().getClass());
     final Optional<Component> tabToSelect = menu.getChildren().filter(tab -> {
       final Component child = tab.getChildren().findFirst().get();
-      return child instanceof RouterLink
-          && ((RouterLink) child).getHref().equals(target);
+      return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
     }).findFirst();
     tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
   }
