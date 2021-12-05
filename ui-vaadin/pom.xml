@@ -11,8 +11,8 @@
   <artifactId>ui-vaadin</artifactId>
   <packaging>war</packaging>
   <properties>
-    <spring-security.version>4.0.3.RELEASE</spring-security.version>
-    <vaadin.version>7.6.1</vaadin.version>
+    <spring-security.version>5.2.9.RELEASE</spring-security.version>
+    <vaadin.version>7.7.28</vaadin.version>
     <vaadin.pagedtable.version>0.6.5</vaadin.pagedtable.version>
     <vaadin.confirmdialog.version>2.1.2</vaadin.confirmdialog.version>
     <h2.version>1.4.187</h2.version>
