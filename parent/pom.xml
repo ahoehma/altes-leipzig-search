@@ -35,7 +35,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <compiler.source.version>1.8</compiler.source.version>
     <compiler.target.version>1.8</compiler.target.version>
-    <guava.version>24.1.1-jre</guava.version>
+    <guava.version>32.0.0-jre</guava.version>
     <jodatime.version>2.9.2</jodatime.version>
     <testng.version>6.9.10</testng.version>
     <springboot.version>2.2.2.RELEASE</springboot.version>
